@@ -1,0 +1,24 @@
+# Source
+source/
+examples/
+docs/
+
+# Config
+vitest.config.ts
+tsdown.config.ts
+biome.json
+tsconfig.json
+tsconfig.build.json
+
+# Scripts / tooling
+scripts/
+Makefile
+
+# Misc
+.env
+.env.*
+*.log
+.DS_Store
+
+# CI
+.github/
