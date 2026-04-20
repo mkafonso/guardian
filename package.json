@@ -8,6 +8,8 @@
     "dist"
   ],
   "scripts": {
+    "test": "vitest",
+    "test:watch": "vitest --watch",
     "build": "tsdown",
     "lint": "biome lint .",
     "format": "biome format . --write"
