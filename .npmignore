@@ -10,7 +10,7 @@ biome.json
 tsconfig.json
 tsconfig.build.json
 
-# Scripts / tooling
+# Scripts
 scripts/
 Makefile
 
