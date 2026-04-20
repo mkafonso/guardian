@@ -1,49 +1,46 @@
-import crypto from 'node:crypto'
 import type { DependencyProps } from './dependency.entity'
 import type { VulnerabilityProps } from './vulnerability.entity'
 
+export type RiskLevel = 'critical' | 'high' | 'medium' | 'low'
+
 export type DependencyRiskProps = {
-  id: string
   dependency: DependencyProps
   vulnerabilities: VulnerabilityProps[]
-  riskLevel: 'critical' | 'high' | 'medium' | 'low' | 'unknown'
+  isReachable: boolean
+  isExposed: boolean
   riskScore: number
-  rationale: string
-  hasFixAvailable: boolean
-  recommendedVersion: string | null
-  createdAt: Date
-  updatedAt: Date
+  level: RiskLevel
+  summary: string
 }
 
 export class DependencyRiskEntity {
   private props: DependencyRiskProps
 
   private constructor(props: DependencyRiskProps) {
-    this.props = Object.freeze({ ...props })
+    this.props = Object.freeze({
+      ...props,
+      dependency: { ...props.dependency },
+      vulnerabilities: props.vulnerabilities.map((item) => ({ ...item })),
+    })
   }
 
   static create(
     dependency: DependencyProps,
     vulnerabilities: VulnerabilityProps[],
-    riskLevel: DependencyRiskProps['riskLevel'],
+    isReachable: boolean,
+    isExposed: boolean,
     riskScore: number,
-    rationale: string,
-    hasFixAvailable: boolean,
-    recommendedVersion: string | null = null,
+    level: RiskLevel,
+    summary: string,
   ): DependencyRiskEntity {
-    const now = new Date()
-
     return new DependencyRiskEntity({
-      id: crypto.randomUUID(),
       dependency: { ...dependency },
       vulnerabilities: vulnerabilities.map((item) => ({ ...item })),
-      riskLevel,
+      isReachable,
+      isExposed,
       riskScore,
-      rationale: rationale.trim(),
-      hasFixAvailable,
-      recommendedVersion: recommendedVersion?.trim() || null,
-      createdAt: now,
-      updatedAt: now,
+      level,
+      summary: summary.trim(),
     })
   }
 
@@ -52,8 +49,7 @@ export class DependencyRiskEntity {
       ...props,
       dependency: { ...props.dependency },
       vulnerabilities: props.vulnerabilities.map((item) => ({ ...item })),
-      rationale: props.rationale.trim(),
-      recommendedVersion: props.recommendedVersion?.trim() || null,
+      summary: props.summary.trim(),
     })
   }
 
@@ -65,10 +61,6 @@ export class DependencyRiskEntity {
     }
   }
 
-  get id(): string {
-    return this.props.id
-  }
-
   get dependency(): DependencyProps {
     return { ...this.props.dependency }
   }
@@ -77,31 +69,23 @@ export class DependencyRiskEntity {
     return this.props.vulnerabilities.map((item) => ({ ...item }))
   }
 
-  get riskLevel(): DependencyRiskProps['riskLevel'] {
-    return this.props.riskLevel
+  get isReachable(): boolean {
+    return this.props.isReachable
+  }
+
+  get isExposed(): boolean {
+    return this.props.isExposed
   }
 
   get riskScore(): number {
     return this.props.riskScore
   }
 
-  get rationale(): string {
-    return this.props.rationale
+  get level(): RiskLevel {
+    return this.props.level
   }
 
-  get hasFixAvailable(): boolean {
-    return this.props.hasFixAvailable
-  }
-
-  get recommendedVersion(): string | null {
-    return this.props.recommendedVersion
-  }
-
-  get createdAt(): Date {
-    return this.props.createdAt
-  }
-
-  get updatedAt(): Date {
-    return this.props.updatedAt
+  get summary(): string {
+    return this.props.summary
   }
 }

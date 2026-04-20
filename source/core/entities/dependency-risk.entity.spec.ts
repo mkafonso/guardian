@@ -10,117 +10,68 @@ describe('DependencyRiskEntity', () => {
   const baseDependency = DependencyEntity.create(
     ' Lodash ',
     ' ^4.17.21 ',
-    ' NPM ',
-    ' PNPM ',
-    true,
-    ' package.json ',
-    ' 4.17.21 ',
     ' 4.17.22 ',
-    ' https://lodash.com/ ',
-    ' https://github.com/lodash/lodash ',
+    'direct',
+    ' PNPM ',
+    ' package.json ',
+    false,
+    null,
+    null,
   ).toJSON()
 
   const baseVulnerability = VulnerabilityEntity.create(
-    ' Lodash ',
-    ' 4.17.21 ',
     ' GHSA-xxxx-yyyy-zzzz ',
-    ' Prototype Pollution ',
+    ' GitHub ',
     'high',
-    '  Details here.  ',
     7.4,
-    ' CVE-2020-8203 ',
-    [' CWE-79 ', ' ', 'CWE-20'],
-    ' <4.17.21 ',
-    ' 4.17.21 ',
-    ' https://github.com/advisories/GHSA-xxxx-yyyy-zzzz ',
-    new Date('2020-01-01T00:00:00.000Z'),
-    new Date('2020-02-01T00:00:00.000Z'),
+    ' Prototype Pollution ',
+    '  Details here.  ',
+    [' 4.17.21 ', ' '],
+    [' https://github.com/advisories/GHSA-xxxx-yyyy-zzzz ', ' '],
   ).toJSON()
 
   it('should create a dependency risk with normalized values', () => {
     const entity = DependencyRiskEntity.create(
       baseDependency,
       [baseVulnerability],
-      'high',
-      0.82,
-      '  vulnerable because...  ',
       true,
-      ' 4.17.22 ',
+      false,
+      0.82,
+      'high',
+      '  vulnerable because...  ',
     )
 
     const json = entity.toJSON()
 
-    expect(json.id).toBeDefined()
     expect(json.dependency).toEqual(baseDependency)
     expect(json.vulnerabilities).toEqual([baseVulnerability])
-    expect(json.riskLevel).toBe('high')
+    expect(json.isReachable).toBe(true)
+    expect(json.isExposed).toBe(false)
     expect(json.riskScore).toBe(0.82)
-    expect(json.rationale).toBe('vulnerable because...')
-    expect(json.hasFixAvailable).toBe(true)
-    expect(json.recommendedVersion).toBe('4.17.22')
-    expect(json.createdAt).toBeInstanceOf(Date)
-    expect(json.updatedAt).toBeInstanceOf(Date)
-    expect(json.createdAt).toBe(json.updatedAt)
-  })
-
-  it('should generate different ids', () => {
-    const a = DependencyRiskEntity.create(
-      baseDependency,
-      [baseVulnerability],
-      'high',
-      0.82,
-      'rationale',
-      true,
-    )
-
-    const b = DependencyRiskEntity.create(
-      baseDependency,
-      [baseVulnerability],
-      'high',
-      0.82,
-      'rationale',
-      true,
-    )
-
-    expect(a.toJSON().id).not.toBe(b.toJSON().id)
-  })
-
-  it('should coerce recommendedVersion to null when blank', () => {
-    const entity = DependencyRiskEntity.create(
-      baseDependency,
-      [baseVulnerability],
-      'high',
-      0.82,
-      'rationale',
-      true,
-      '   ',
-    )
-
-    expect(entity.toJSON().recommendedVersion).toBeNull()
+    expect(json.level).toBe('high')
+    expect(json.summary).toBe('vulnerable because...')
   })
 
   it('should restore with normalization', () => {
     const props: DependencyRiskProps = {
-      id: 'id',
-      dependency: { ...baseDependency, name: ' Lodash ' },
+      dependency: { ...baseDependency },
       vulnerabilities: [
         { ...baseVulnerability, title: ' Prototype Pollution ' },
       ],
-      riskLevel: 'medium',
+      isReachable: false,
+      isExposed: true,
       riskScore: 0.5,
-      rationale: '  because...  ',
-      hasFixAvailable: false,
-      recommendedVersion: ' 4.17.21 ',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      level: 'medium',
+      summary: '  because...  ',
     }
 
     const entity = DependencyRiskEntity.restore(props)
     const json = entity.toJSON()
 
-    expect(json.rationale).toBe('because...')
-    expect(json.recommendedVersion).toBe('4.17.21')
-    expect(json.dependency.name).toBe(' Lodash ')
+    expect(json.summary).toBe('because...')
+    expect(json.isReachable).toBe(false)
+    expect(json.isExposed).toBe(true)
+    expect(json.level).toBe('medium')
     expect(json.vulnerabilities[0]?.title).toBe(' Prototype Pollution ')
   })
 
@@ -131,10 +82,11 @@ describe('DependencyRiskEntity', () => {
     const entity = DependencyRiskEntity.create(
       depInput,
       [vulnInput],
-      'high',
-      0.82,
-      'rationale',
       true,
+      false,
+      0.82,
+      'high',
+      'summary',
     )
 
     depInput.name = 'hack'
@@ -155,6 +107,13 @@ describe('DependencyRiskEntity', () => {
 
     expect(entity.vulnerabilities).toHaveLength(1)
     expect(entity.vulnerabilities[0]?.title).toBe('Prototype Pollution')
+
+    const a = entity.toJSON()
+    const b = entity.toJSON()
+
+    expect(a).not.toBe(b)
+    expect(a.dependency).not.toBe(b.dependency)
+    expect(a.vulnerabilities).not.toBe(b.vulnerabilities)
 
     const internal = (entity as unknown as { props: object }).props
     expect(Object.isFrozen(internal)).toBe(true)
