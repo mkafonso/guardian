@@ -101,9 +101,13 @@ describe('DependencyEntity', () => {
     expect(jsonA.constraints).not.toBe(jsonB.constraints)
     expect(jsonA.manifest).not.toBe(jsonB.manifest)
 
-    jsonA.constraints?.resolutions &&
-      (jsonA.constraints.resolutions.lodash = 'hack')
-    jsonA.manifest?.scripts && (jsonA.manifest.scripts.test = 'hack')
+    if (jsonA.constraints) {
+      jsonA.constraints.resolutions.lodash = 'hack'
+    }
+
+    if (jsonA.manifest) {
+      jsonA.manifest.scripts.test = 'hack'
+    }
 
     expect(entity.toJSON().constraints?.resolutions.lodash).toBe('^4.17.22')
     expect(entity.toJSON().manifest?.scripts.test).toBe(' vitest ')
