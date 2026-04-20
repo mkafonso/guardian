@@ -1,0 +1,19 @@
+{
+  "name": "guardian",
+  "version": "0.1.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format . --write && npx prisma format"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12",
+    "@types/node": "25.6.0",
+    "tsup": "8.5.1",
+    "typescript": "6.0.3",
+    "vitest": "4.1.4"
+  }
+}
