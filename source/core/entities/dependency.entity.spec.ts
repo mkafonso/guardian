@@ -1,111 +1,149 @@
 import { describe, expect, it } from 'vitest'
-
 import { DependencyEntity, type DependencyProps } from './dependency.entity'
 
 describe('DependencyEntity', () => {
   const baseInput = {
     name: ' Lodash ',
-    version: ' ^4.17.21 ',
-    ecosystem: ' NPM ',
-    packageManager: ' PNPM ',
-    isDirect: true,
-    manifestPath: ' package.json ',
-    installedVersion: ' 4.17.21 ',
     latestVersion: ' 4.17.22 ',
-    homepage: ' https://lodash.com/ ',
-    repositoryUrl: ' https://github.com/lodash/lodash ',
+    version: ' ^4.17.21 ',
+    type: 'direct' as const,
+    packageManager: ' PNPM ',
+    path: ' package.json ',
+    isDev: false,
+    constraints: {
+      resolutions: { lodash: '^4.17.22' },
+      overrides: { lodash: '^4.17.22' },
+    },
+    manifest: {
+      scripts: { test: ' vitest ' },
+      engines: { node: ' >=20 ' },
+      license: ' MIT ',
+      dependenciesCount: 10,
+      devDependenciesCount: 2,
+      hasPackageLock: false,
+      hasYarnLock: false,
+      hasPnpmLock: true,
+    },
   }
 
   it('should create a dependency with normalized values', () => {
+    const constraintsInput = {
+      resolutions: { ...baseInput.constraints.resolutions },
+      overrides: { ...baseInput.constraints.overrides },
+    }
+
+    const manifestInput = {
+      ...baseInput.manifest,
+      scripts: { ...baseInput.manifest.scripts },
+      engines: { ...baseInput.manifest.engines },
+    }
+
     const entity = DependencyEntity.create(
       baseInput.name,
       baseInput.version,
-      baseInput.ecosystem,
-      baseInput.packageManager,
-      baseInput.isDirect,
-      baseInput.manifestPath,
-      baseInput.installedVersion,
       baseInput.latestVersion,
-      baseInput.homepage,
-      baseInput.repositoryUrl,
+      baseInput.type,
+      baseInput.packageManager,
+      baseInput.path,
+      baseInput.isDev,
+      constraintsInput,
+      manifestInput,
     )
 
     const json = entity.toJSON()
 
-    expect(json.id).toBeDefined()
     expect(json.name).toBe('Lodash')
     expect(json.version).toBe('^4.17.21')
-    expect(json.ecosystem).toBe('npm')
-    expect(json.packageManager).toBe('pnpm')
-    expect(json.isDirect).toBe(true)
-    expect(json.manifestPath).toBe('package.json')
-    expect(json.installedVersion).toBe('4.17.21')
     expect(json.latestVersion).toBe('4.17.22')
-    expect(json.homepage).toBe('https://lodash.com/')
-    expect(json.repositoryUrl).toBe('https://github.com/lodash/lodash')
-    expect(json.createdAt).toBeInstanceOf(Date)
-    expect(json.updatedAt).toBeInstanceOf(Date)
-    expect(json.createdAt).toBe(json.updatedAt)
+    expect(json.type).toBe('direct')
+    expect(json.packageManager).toBe('pnpm')
+    expect(json.path).toBe('package.json')
+    expect(json.isDev).toBe(false)
+    expect(json.constraints).toEqual({
+      resolutions: { lodash: '^4.17.22' },
+      overrides: { lodash: '^4.17.22' },
+    })
+    expect(json.manifest).toEqual({
+      scripts: { test: ' vitest ' },
+      engines: { node: ' >=20 ' },
+      license: ' MIT ',
+      dependenciesCount: 10,
+      devDependenciesCount: 2,
+      hasPackageLock: false,
+      hasYarnLock: false,
+      hasPnpmLock: true,
+    })
+
+    constraintsInput.resolutions.lodash = 'hack'
+    manifestInput.scripts.test = 'hack'
+
+    expect(entity.toJSON().constraints?.resolutions.lodash).toBe('^4.17.22')
+    expect(entity.toJSON().manifest?.scripts.test).toBe(' vitest ')
   })
 
-  it('should generate different ids', () => {
-    const a = DependencyEntity.create(
-      baseInput.name,
-      baseInput.version,
-      baseInput.ecosystem,
-      baseInput.packageManager,
-      baseInput.isDirect,
-    )
-
-    const b = DependencyEntity.create(
-      baseInput.name,
-      baseInput.version,
-      baseInput.ecosystem,
-      baseInput.packageManager,
-      baseInput.isDirect,
-    )
-
-    expect(a.toJSON().id).not.toBe(b.toJSON().id)
-  })
-
-  it('should coerce optional string fields to null when blank', () => {
+  it('should return copies in toJSON and getters (no shared references)', () => {
     const entity = DependencyEntity.create(
       baseInput.name,
       baseInput.version,
-      baseInput.ecosystem,
+      baseInput.latestVersion,
+      baseInput.type,
       baseInput.packageManager,
-      baseInput.isDirect,
-      '   ',
-      ' ',
-      '',
-      '  ',
-      '\n',
+      baseInput.path,
+      baseInput.isDev,
+      baseInput.constraints,
+      baseInput.manifest,
     )
 
-    const json = entity.toJSON()
+    const jsonA = entity.toJSON()
+    const jsonB = entity.toJSON()
 
-    expect(json.manifestPath).toBeNull()
-    expect(json.installedVersion).toBeNull()
-    expect(json.latestVersion).toBeNull()
-    expect(json.homepage).toBeNull()
-    expect(json.repositoryUrl).toBeNull()
+    expect(jsonA).not.toBe(jsonB)
+    expect(jsonA.constraints).not.toBe(jsonB.constraints)
+    expect(jsonA.manifest).not.toBe(jsonB.manifest)
+
+    jsonA.constraints?.resolutions &&
+      (jsonA.constraints.resolutions.lodash = 'hack')
+    jsonA.manifest?.scripts && (jsonA.manifest.scripts.test = 'hack')
+
+    expect(entity.toJSON().constraints?.resolutions.lodash).toBe('^4.17.22')
+    expect(entity.toJSON().manifest?.scripts.test).toBe(' vitest ')
+
+    const constraints = entity.constraints
+    const manifest = entity.manifest
+
+    expect(constraints).not.toBeNull()
+    expect(manifest).not.toBeNull()
+
+    if (constraints) constraints.resolutions.lodash = 'hack'
+    if (manifest) manifest.scripts.test = 'hack'
+
+    expect(entity.constraints?.resolutions.lodash).toBe('^4.17.22')
+    expect(entity.manifest?.scripts.test).toBe(' vitest ')
   })
 
   it('should restore with normalization', () => {
     const props: DependencyProps = {
-      id: 'id',
       name: ' Lodash ',
       version: ' ^4.17.21 ',
-      ecosystem: ' NPM ',
-      packageManager: ' PNPM ',
-      isDirect: false,
-      manifestPath: ' package.json ',
-      installedVersion: ' 4.17.21 ',
       latestVersion: ' 4.17.22 ',
-      homepage: ' https://lodash.com/ ',
-      repositoryUrl: ' https://github.com/lodash/lodash ',
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      type: 'indirect',
+      packageManager: ' PNPM ',
+      path: ' package.json ',
+      isDev: true,
+      constraints: {
+        resolutions: { lodash: '^4.17.22' },
+        overrides: { lodash: '^4.17.22' },
+      },
+      manifest: {
+        scripts: { test: ' vitest ' },
+        engines: { node: ' >=20 ' },
+        license: ' MIT ',
+        dependenciesCount: 10,
+        devDependenciesCount: 2,
+        hasPackageLock: false,
+        hasYarnLock: false,
+        hasPnpmLock: true,
+      },
     }
 
     const entity = DependencyEntity.restore(props)
@@ -113,22 +151,24 @@ describe('DependencyEntity', () => {
 
     expect(json.name).toBe('Lodash')
     expect(json.version).toBe('^4.17.21')
-    expect(json.ecosystem).toBe('npm')
-    expect(json.packageManager).toBe('pnpm')
-    expect(json.manifestPath).toBe('package.json')
-    expect(json.installedVersion).toBe('4.17.21')
     expect(json.latestVersion).toBe('4.17.22')
-    expect(json.homepage).toBe('https://lodash.com/')
-    expect(json.repositoryUrl).toBe('https://github.com/lodash/lodash')
+    expect(json.type).toBe('indirect')
+    expect(json.packageManager).toBe('pnpm')
+    expect(json.path).toBe('package.json')
+    expect(json.isDev).toBe(true)
   })
 
   it('should be immutable (frozen)', () => {
     const entity = DependencyEntity.create(
       baseInput.name,
       baseInput.version,
-      baseInput.ecosystem,
+      baseInput.latestVersion,
+      baseInput.type,
       baseInput.packageManager,
-      baseInput.isDirect,
+      baseInput.path,
+      baseInput.isDev,
+      baseInput.constraints,
+      baseInput.manifest,
     )
 
     const json = entity.toJSON()

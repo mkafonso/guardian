@@ -1,56 +1,87 @@
-import crypto from 'node:crypto'
+export type DependencyType = 'direct' | 'indirect'
+
+export type PackageConstraintsProps = {
+  resolutions: Record<string, string>
+  overrides: Record<string, unknown>
+}
+
+export type ProjectManifestProps = {
+  scripts: Record<string, string>
+  engines: Record<string, string>
+  license: string
+  dependenciesCount: number
+  devDependenciesCount: number
+  hasPackageLock: boolean
+  hasYarnLock: boolean
+  hasPnpmLock: boolean
+}
 
 export type DependencyProps = {
-  id: string
   name: string
   version: string
-  ecosystem: string
+  latestVersion: string
+  type: DependencyType
   packageManager: string
-  isDirect: boolean
-  manifestPath: string | null
-  installedVersion: string | null
-  latestVersion: string | null
-  homepage: string | null
-  repositoryUrl: string | null
-  createdAt: Date
-  updatedAt: Date
+  path: string
+  isDev: boolean
+  constraints: PackageConstraintsProps | null
+  manifest: ProjectManifestProps | null
 }
 
 export class DependencyEntity {
   private props: DependencyProps
 
   private constructor(props: DependencyProps) {
-    this.props = Object.freeze({ ...props })
+    this.props = Object.freeze({
+      ...props,
+      constraints: props.constraints
+        ? {
+            resolutions: { ...props.constraints.resolutions },
+            overrides: { ...props.constraints.overrides },
+          }
+        : null,
+      manifest: props.manifest
+        ? {
+            ...props.manifest,
+            scripts: { ...props.manifest.scripts },
+            engines: { ...props.manifest.engines },
+          }
+        : null,
+    })
   }
 
   static create(
     name: string,
     version: string,
-    ecosystem: string,
+    latestVersion: string,
+    type: DependencyType,
     packageManager: string,
-    isDirect: boolean,
-    manifestPath: string | null = null,
-    installedVersion: string | null = null,
-    latestVersion: string | null = null,
-    homepage: string | null = null,
-    repositoryUrl: string | null = null,
+    path: string,
+    isDev: boolean,
+    constraints: PackageConstraintsProps | null = null,
+    manifest: ProjectManifestProps | null = null,
   ): DependencyEntity {
-    const now = new Date()
-
     return new DependencyEntity({
-      id: crypto.randomUUID(),
       name: name.trim(),
       version: version.trim(),
-      ecosystem: ecosystem.trim().toLowerCase(),
+      latestVersion: latestVersion.trim(),
+      type,
       packageManager: packageManager.trim().toLowerCase(),
-      manifestPath: manifestPath?.trim() || null,
-      installedVersion: installedVersion?.trim() || null,
-      latestVersion: latestVersion?.trim() || null,
-      homepage: homepage?.trim() || null,
-      repositoryUrl: repositoryUrl?.trim() || null,
-      isDirect,
-      createdAt: now,
-      updatedAt: now,
+      path: path.trim(),
+      isDev,
+      constraints: constraints
+        ? {
+            resolutions: { ...constraints.resolutions },
+            overrides: { ...constraints.overrides },
+          }
+        : null,
+      manifest: manifest
+        ? {
+            ...manifest,
+            scripts: { ...manifest.scripts },
+            engines: { ...manifest.engines },
+          }
+        : null,
     })
   }
 
@@ -59,22 +90,42 @@ export class DependencyEntity {
       ...props,
       name: props.name.trim(),
       version: props.version.trim(),
-      ecosystem: props.ecosystem.trim().toLowerCase(),
+      latestVersion: props.latestVersion.trim(),
       packageManager: props.packageManager.trim().toLowerCase(),
-      manifestPath: props.manifestPath?.trim() || null,
-      installedVersion: props.installedVersion?.trim() || null,
-      latestVersion: props.latestVersion?.trim() || null,
-      homepage: props.homepage?.trim() || null,
-      repositoryUrl: props.repositoryUrl?.trim() || null,
+      path: props.path.trim(),
+      constraints: props.constraints
+        ? {
+            resolutions: { ...props.constraints.resolutions },
+            overrides: { ...props.constraints.overrides },
+          }
+        : null,
+      manifest: props.manifest
+        ? {
+            ...props.manifest,
+            scripts: { ...props.manifest.scripts },
+            engines: { ...props.manifest.engines },
+          }
+        : null,
     })
   }
 
   toJSON(): DependencyProps {
-    return { ...this.props }
-  }
-
-  get id(): string {
-    return this.props.id
+    return {
+      ...this.props,
+      constraints: this.props.constraints
+        ? {
+            resolutions: { ...this.props.constraints.resolutions },
+            overrides: { ...this.props.constraints.overrides },
+          }
+        : null,
+      manifest: this.props.manifest
+        ? {
+            ...this.props.manifest,
+            scripts: { ...this.props.manifest.scripts },
+            engines: { ...this.props.manifest.engines },
+          }
+        : null,
+    }
   }
 
   get name(): string {
@@ -85,43 +136,42 @@ export class DependencyEntity {
     return this.props.version
   }
 
-  get ecosystem(): string {
-    return this.props.ecosystem
+  get latestVersion(): string {
+    return this.props.latestVersion
+  }
+
+  get type(): DependencyType {
+    return this.props.type
   }
 
   get packageManager(): string {
     return this.props.packageManager
   }
 
-  get isDirect(): boolean {
-    return this.props.isDirect
+  get path(): string {
+    return this.props.path
   }
 
-  get manifestPath(): string | null {
-    return this.props.manifestPath
+  get isDev(): boolean {
+    return this.props.isDev
   }
 
-  get installedVersion(): string | null {
-    return this.props.installedVersion
+  get constraints(): PackageConstraintsProps | null {
+    return this.props.constraints
+      ? {
+          resolutions: { ...this.props.constraints.resolutions },
+          overrides: { ...this.props.constraints.overrides },
+        }
+      : null
   }
 
-  get latestVersion(): string | null {
-    return this.props.latestVersion
-  }
-
-  get homepage(): string | null {
-    return this.props.homepage
-  }
-
-  get repositoryUrl(): string | null {
-    return this.props.repositoryUrl
-  }
-
-  get createdAt(): Date {
-    return this.props.createdAt
-  }
-
-  get updatedAt(): Date {
-    return this.props.updatedAt
+  get manifest(): ProjectManifestProps | null {
+    return this.props.manifest
+      ? {
+          ...this.props.manifest,
+          scripts: { ...this.props.manifest.scripts },
+          engines: { ...this.props.manifest.engines },
+        }
+      : null
   }
 }
