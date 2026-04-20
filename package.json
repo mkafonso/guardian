@@ -4,15 +4,19 @@
   "description": "",
   "author": "",
   "license": "ISC",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsdown",
     "lint": "biome lint .",
-    "format": "biome format . --write && npx prisma format"
+    "format": "biome format . --write"
   },
   "keywords": [],
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
     "@types/node": "25.6.0",
-    "tsup": "8.5.1",
+    "tsdown": "0.21.9",
     "typescript": "6.0.3",
     "vitest": "4.1.4"
   }
