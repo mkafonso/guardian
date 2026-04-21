@@ -21,6 +21,7 @@
                 <div
                     class="w-16 h-16 rounded-full border-4 border-<%= it.securityColor %>/20 flex items-center justify-center relative">
                     <svg class="absolute inset-0 w-full h-full -rotate-90">
+                        <title>Pontuação de Segurança</title>
                         <circle class="text-<%= it.securityColor %>" cx="32" cy="32" fill="transparent" r="28"
                             stroke="currentColor" stroke-dasharray="175" stroke-dashoffset="120" stroke-width="4">
                         </circle>
