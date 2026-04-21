@@ -12,11 +12,13 @@ import { AnalyzeProjectDependenciesUseCase } from '@/core/usecases/analyze-proje
 import { AssessDependencyRisksUseCase } from '@/core/usecases/assess-dependency-risks.usecase'
 import { CollectSecurityIncidentsUseCase } from '@/core/usecases/collect-security-incidents.usecase'
 import { PlanDependencyActionsUseCase } from '@/core/usecases/plan-dependency-actions.usecase'
+import { OpenAISecurityIncidentNarratorAdapter } from '@/infra/ai/openai-security-incident-narrator.adapter'
 import { FileSystemProjectManifestReaderAdapter } from '@/infra/package-managers/file-system-project-manifest-reader.adapter'
 import { PackageJsonDependencyInventoryAdapter } from '@/infra/package-managers/package-json-dependency-inventory.adapter'
 import { SimpleReachabilityAnalyzerAdapter } from '@/infra/reachability/simple-reachability-analyzer.adapter'
 import { NpmRegistryAdapter } from '@/infra/registries/npm-registry.adapter'
 import { HtmlTemplateRendererAdapter } from '@/infra/report/html-template-renderer.adapter'
+import { OsvSecurityIncidentsRadarAdapter } from '@/infra/vulnerabilities/osv-security-incidents-radar.adapter'
 import { OsvVulnerabilityDataSourceAdapter } from '@/infra/vulnerabilities/osv-vulnerability-data-source.adapter'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -89,10 +91,20 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
     undefined,
   )
 
-  const collectSecurityIncidentsUseCase = new CollectSecurityIncidentsUseCase(
-    incidentRadarMappingService,
-    undefined,
-  )
+  const openAiApiKey = process.env.OPENAI_API_KEY?.trim() ?? ''
+  const githubToken = process.env.GITHUB_TOKEN?.trim() ?? ''
+  const showIncidentsRadar =
+    options.includeSecurityIncidents &&
+    Boolean(openAiApiKey) &&
+    Boolean(githubToken)
+
+  const collectSecurityIncidentsUseCase = showIncidentsRadar
+    ? new CollectSecurityIncidentsUseCase(
+        incidentRadarMappingService,
+        new OsvSecurityIncidentsRadarAdapter({ githubToken }),
+        new OpenAISecurityIncidentNarratorAdapter({ apiKey: openAiApiKey }),
+      )
+    : null
 
   const analyzed = await runStep(
     'lendo package.json e dependências...',
@@ -138,13 +150,22 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
     },
   )
 
-  const incidents = options.includeSecurityIncidents
+  const incidents = showIncidentsRadar
     ? await runStep(
         'consultando radar de incidentes...',
         () => {
           return pc.green('radar carregado')
         },
         async () => {
+          if (!collectSecurityIncidentsUseCase) {
+            return {
+              incidents: [],
+              emergingPatterns: [],
+              actionableInsights: [],
+              error: null,
+            }
+          }
+
           return await collectSecurityIncidentsUseCase.execute({
             dependencyNames: analyzed.dependencies.map(
               (item) => item.inventory.name,
@@ -184,6 +205,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
     npmInstallCriticalCmd: plannedActions.commands.npmInstallCriticalCmd,
     npmInstallCriticalDevCmd: plannedActions.commands.npmInstallCriticalDevCmd,
     npmCriticalNotes: plannedActions.commands.npmCriticalNotes,
+    showIncidentsRadar,
     securityIncidents: incidents.incidents,
     securityIncidentsError: incidents.error,
     emergingPatterns: incidents.emergingPatterns,
@@ -221,19 +243,22 @@ function runStep<T>(
 ): Promise<T> {
   const spinner = yoctoSpinner({ text: `${text}` }).start()
 
-  return fn()
-    .then((value) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0)
+  }).then(async () => {
+    try {
+      const value = await fn()
       spinner.success(`${successText(value)}`)
       return value
-    })
-    .catch((error) => {
+    } catch (error) {
       const message =
         error instanceof Error && error.message.trim().length > 0
           ? error.message.trim()
           : 'erro inesperado'
       spinner.error(`${pc.red('✖')} ${message}`)
       throw error
-    })
+    }
+  })
 }
 
 function parseAnalyzeCommandOptions(args: string[]): AnalyzeCommandOptions {
