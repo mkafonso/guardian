@@ -28,14 +28,14 @@
     "dist"
   ],
   "bin": {
-    "guardian": "./dist/infra/interfaces/cli/index.mjs"
+    "guardian": "./dist/index.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsdown",
-    "dev": "tsx source/infra/interfaces/cli/index.ts analyze",
+    "dev": "npm run build && npm unlink -g guardian && npm link && guardian analyze",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "lint": "biome lint .",
