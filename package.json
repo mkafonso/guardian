@@ -1,20 +1,57 @@
 {
   "name": "guardian",
   "version": "0.1.0",
-  "description": "",
-  "author": "",
-  "license": "ISC",
+  "description": "A CLI tool that analyzes Node.js dependencies, prioritizes risks, and generates actionable HTML reports.",
+  "type": "module",
+  "license": "MIT",
+  "author": "mkafonso <mkafonso.dev@gmail.com>",
+  "homepage": "https://github.com/mkafonso/guardian",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkafonso/guardian.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mkafonso/guardian/issues"
+  },
+  "keywords": [
+    "security",
+    "dependencies",
+    "npm",
+    "audit",
+    "vulnerabilities",
+    "cli",
+    "typescript",
+    "dependency-analysis",
+    "devtools",
+    "nodejs"
+  ],
   "files": [
     "dist"
   ],
+  "bin": {
+    "guardian": "./dist/infra/interfaces/cli/index.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
+    "build": "tsdown",
+    "dev": "tsx source/infra/interfaces/cli/index.ts analyze",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "build": "tsdown",
     "lint": "biome lint .",
-    "format": "biome format . --write"
+    "format": "biome format . --write",
+    "check": "biome check .",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
   "dependencies": {
     "eta": "4.5.1"
   },
