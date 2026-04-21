@@ -71,31 +71,6 @@ export class StaticMaintenanceAnalysisService {
       )
     }
 
-    if (
-      usesTypeScript &&
-      !this.hasAnyDependency(dependencySet, [
-        'ts-node',
-        'tsx',
-        'swc',
-        '@swc/core',
-        '@swc-node/register',
-        '@swc/register',
-      ])
-    ) {
-      findings.push(
-        this.createFinding({
-          code: 'typescript-without-modern-runner',
-          tag: 'DX / Execution',
-          icon: 'bolt',
-          packageName: 'typescript',
-          description:
-            'Não há indícios de ferramentas modernas para execução direta de TypeScript. Isso pode indicar builds mais lentos ou fluxo menos produtivo.',
-          recommendation:
-            'Avalie uso de tsx ou swc para melhorar a experiência de desenvolvimento.',
-        }),
-      )
-    }
-
     if (usesESLint && usesPrettier) {
       findings.push(
         this.createFinding({
