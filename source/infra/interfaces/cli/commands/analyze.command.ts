@@ -134,11 +134,8 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
 
   const plannedActions = await runStep(
     'planejando ações...',
-    () => {
-      const vulns = assessed.assessedRisks.reduce(
-        (sum, item) => sum + item.vulnerabilities.length,
-        0,
-      )
+    (value) => {
+      const vulns = value.criticalRisks.length
       return pc.green(`${vulns} vulnerabilidades encontradas`)
     },
     async () => {
