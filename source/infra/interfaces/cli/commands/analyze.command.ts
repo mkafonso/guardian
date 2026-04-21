@@ -107,7 +107,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
   const assessed = await runStep(
     'consultando vulnerabilidades...',
     () => {
-      const total = analyzed.dependencies.reduce((sum, item) => sum + 1, 0)
+      const total = analyzed.dependencies.length
       const vulns = analyzed.dependencies.length
       return pc.green(`análise concluída (${total} deps / ${vulns} packages)`)
     },

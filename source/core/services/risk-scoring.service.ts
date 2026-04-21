@@ -130,9 +130,6 @@ export class RiskScoringService {
         return this.weights.high
       case 'medium':
         return this.weights.medium
-      case 'low':
-        return this.weights.low
-      case 'unknown':
       default:
         return this.weights.low
     }

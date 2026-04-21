@@ -50,9 +50,17 @@ export class UpgradePlanningService {
     dependency: DependencyInventoryItem,
     riskLevel: DependencyRiskLevel,
   ): PlannedUpgrade {
+    const targetVersion = dependency.latestVersion
+
+    if (!targetVersion) {
+      throw new Error(
+        `Cannot resolve upgrade type for dependency "${dependency.name}" without latestVersion.`,
+      )
+    }
+
     const upgradeType = this.resolveUpgradeType(
       dependency.version,
-      dependency.latestVersion!,
+      targetVersion,
     )
 
     const isCriticalUpdate = riskLevel === 'critical' || riskLevel === 'high'

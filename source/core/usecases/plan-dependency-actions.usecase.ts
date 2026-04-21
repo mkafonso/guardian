@@ -170,14 +170,21 @@ export class PlanDependencyActionsUseCase {
     safeUpdates: PlannedUpgrade[],
   ): SafeUpdateRowViewModel[] {
     return safeUpdates
-      .filter((item) => item.targetVersion)
-      .map((item) => ({
-        packageName: item.packageName,
-        currentVersion: item.currentVersion,
-        latestVersion: item.targetVersion!,
-        riskLevel: item.riskLevel,
-        color: this.resolveSafeUpdateColor(item.riskLevel),
-      }))
+      .flatMap((item) => {
+        if (!item.targetVersion) {
+          return []
+        }
+
+        return [
+          {
+            packageName: item.packageName,
+            currentVersion: item.currentVersion,
+            latestVersion: item.targetVersion,
+            riskLevel: item.riskLevel,
+            color: this.resolveSafeUpdateColor(item.riskLevel),
+          },
+        ]
+      })
       .sort((a, b) => a.packageName.localeCompare(b.packageName))
   }
 
@@ -266,7 +273,6 @@ export class PlanDependencyActionsUseCase {
         return 'secondary'
       case 'medium':
         return 'tertiary'
-      case 'low':
       default:
         return 'primary'
     }

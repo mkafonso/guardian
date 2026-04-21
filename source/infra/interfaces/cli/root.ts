@@ -19,7 +19,6 @@ export async function runCli(argv: string[]): Promise<void> {
       printVersion()
       return
 
-    case 'help':
     default:
       printHelp()
   }

@@ -203,7 +203,7 @@ export class StaticMaintenanceAnalysisService {
     if (this.hasDependency(dependencySet, 'jest') && input.manifest) {
       const testScript = this.normalizeText(input.manifest.scripts.test)
 
-      if (!testScript || !testScript.includes('jest')) {
+      if (!testScript?.includes('jest')) {
         findings.push(
           this.createFinding({
             code: 'jest-without-test-script',
