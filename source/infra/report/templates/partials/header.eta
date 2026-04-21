@@ -5,27 +5,27 @@
                 </h1>
                 <p class="text-stone-500 mt-2 font-medium tracking-wide">
                     Análise gerada:
-                    <span class="text-stone-300 text-sm"><%= it.GeneratedAt %></span>
+                    <span class="text-stone-300 text-sm"><%= it.generatedAt %></span>
                 </p>
             </div>
             <div
-                class="flex items-center gap-4 bg-surface-container-low p-6 rounded-xl border-l-4 border-<%= it.SecurityColor %> shadow-2xl">
+                class="flex items-center gap-4 bg-surface-container-low p-6 rounded-xl border-l-4 border-<%= it.securityColor %> shadow-2xl">
                 <div class="text-right">
                     <p class="font-label text-[10px] uppercase tracking-widest text-stone-400">
                         Pontuação de Segurança
                     </p>
-                    <p class="font-headline text-3xl font-bold text-<%= it.SecurityColor %>">
-                        <%= it.SecurityScoreText %>
+                    <p class="font-headline text-3xl font-bold text-<%= it.securityColor %>">
+                        <%= it.securityScoreText %>
                     </p>
                 </div>
                 <div
-                    class="w-16 h-16 rounded-full border-4 border-<%= it.SecurityColor %>/20 flex items-center justify-center relative">
+                    class="w-16 h-16 rounded-full border-4 border-<%= it.securityColor %>/20 flex items-center justify-center relative">
                     <svg class="absolute inset-0 w-full h-full -rotate-90">
-                        <circle class="text-<%= it.SecurityColor %>" cx="32" cy="32" fill="transparent" r="28"
+                        <circle class="text-<%= it.securityColor %>" cx="32" cy="32" fill="transparent" r="28"
                             stroke="currentColor" stroke-dasharray="175" stroke-dashoffset="120" stroke-width="4">
                         </circle>
                     </svg>
-                    <span class="font-headline text-xl font-bold text-<%= it.SecurityColor %>"><%= it.SecurityScoreNum %></span>
+                    <span class="font-headline text-xl font-bold text-<%= it.securityColor %>"><%= it.securityScoreNum %></span>
                 </div>
             </div>
         </section>

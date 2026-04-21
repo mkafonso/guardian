@@ -7,7 +7,7 @@
                     Atualizações Seguras
                 </p>
                 <p class="font-headline text-4xl font-bold text-on-surface">
-                    <%= it.SafeUpdatesCount %>
+                    <%= it.safeUpdatesCount %>
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
                     <span class="w-2 h-2 rounded-full bg-primary"></span>
@@ -23,7 +23,7 @@
                     Riscos Críticos
                 </p>
                 <p class="font-headline text-4xl font-bold text-on-surface">
-                    <%= it.CriticalRisksCount %>
+                    <%= it.criticalRisksCount %>
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
                     <span class="w-2 h-2 rounded-full bg-secondary"></span>
@@ -38,7 +38,7 @@
                     Manutenção
                 </p>
                 <p class="font-headline text-4xl font-bold text-on-surface">
-                    <%= it.MaintenanceCount %>
+                    <%= it.maintenanceCount %>
                 </p>
                 <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
                     <span class="w-2 h-2 rounded-full bg-tertiary"></span>

@@ -16,36 +16,36 @@
                     </div>
                 </div>
 
-                <% if (it.SecurityIncidentsError) { %>
+                <% if (it.securityIncidentsError) { %>
                 <div class="mt-6 rounded-xl bg-secondary/10 border border-secondary/20 p-5 text-stone-200">
                     <p class="font-headline font-bold text-secondary">
                         Radar indisponível
                     </p>
                     <p class="mt-2 text-sm text-stone-300">
-                        <%= it.SecurityIncidentsError %>
+                        <%= it.securityIncidentsError %>
                     </p>
                 </div>
-                <% } else if (it.SecurityIncidents && it.SecurityIncidents.length) { %>
+                <% } else if (it.securityIncidents && it.securityIncidents.length) { %>
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <% for (const incident of it.SecurityIncidents) { %>
+                    <% for (const incident of it.securityIncidents) { %>
                     <details
                         class="group rounded-xl border border-pink-500/15 bg-surface-container-low shadow-sm hover:shadow-xl hover:border-pink-500/30 transition-all">
                         <summary class="cursor-pointer list-none p-5 flex items-start justify-between gap-4">
                             <div class="min-w-0">
                                 <p class="font-headline text-lg font-bold text-on-surface truncate">
-                                    <%= incident.Title %>
+                                    <%= incident.title %>
                                 </p>
                                 <div class="mt-2 flex items-center gap-2 flex-wrap">
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-200 text-[10px] font-bold border border-pink-500/20 uppercase tracking-widest">
-                                        <%= incident.Type %>
+                                        <%= incident.type %>
                                     </span>
                                     <span
-                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= incident.BadgeColor %>/10 text-<%= incident.BadgeColor %> text-[10px] font-bold border border-<%= incident.BadgeColor %>/20 uppercase tracking-widest">
-                                        <span class="w-1 h-1 rounded-full bg-<%= incident.BadgeColor %>"></span>
-                                        <%= incident.Severity %>
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= incident.badgeColor %>/10 text-<%= incident.badgeColor %> text-[10px] font-bold border border-<%= incident.badgeColor %>/20 uppercase tracking-widest">
+                                        <span class="w-1 h-1 rounded-full bg-<%= incident.badgeColor %>"></span>
+                                        <%= incident.severity %>
                                     </span>
-                                    <span class="text-[10px] uppercase tracking-widest text-stone-500">confiança: <%= incident.Confidence %></span>
+                                    <span class="text-[10px] uppercase tracking-widest text-stone-500">confiança: <%= incident.confidence %></span>
                                 </div>
                             </div>
 
@@ -54,56 +54,56 @@
                         </summary>
 
                         <div class="px-5 pb-5 pt-0 border-t border-pink-500/10">
-                            <% if (incident.AffectedEcosystem && incident.AffectedEcosystem.length) { %>
+                            <% if (incident.affectedEcosystem && incident.affectedEcosystem.length) { %>
                             <div class="mt-4 flex flex-wrap gap-2">
-                                <% for (const eco of incident.AffectedEcosystem) { %>
+                                <% for (const eco of incident.affectedEcosystem) { %>
                                 <span
                                     class="px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-200 text-[10px] font-bold border border-pink-500/20"><%= eco %></span>
                                 <% } %>
                             </div>
                             <% } %>
-                            <% if (incident.Summary) { %>
+                            <% if (incident.summary) { %>
                             <p class="mt-4 text-stone-300 text-sm leading-relaxed">
-                                <%= incident.Summary %>
+                                <%= incident.summary %>
                             </p>
                             <% } %>
 
                             <div class="mt-4 space-y-3 text-sm text-stone-300 leading-relaxed">
-                                <% if (incident.OccurredAt) { %>
+                                <% if (incident.occurredAt) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Quando:</span>
-                                    <%= incident.OccurredAt %>
+                                    <%= incident.occurredAt %>
                                 </p>
                                 <% } %>
-                                <% if (incident.SourceURL) { %>
+                                <% if (incident.sourceURL) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Fonte:</span>
                                     <a class="text-primary underline decoration-primary/40 hover:decoration-primary"
-                                        href="<%= incident.SourceURL %>" target="_blank" rel="noreferrer"><%= incident.SourceURL %></a>
+                                        href="<%= incident.sourceURL %>" target="_blank" rel="noreferrer"><%= incident.sourceURL %></a>
                                 </p>
                                 <% } %>
-                                <% if (incident.TechnicalVector) { %>
+                                <% if (incident.technicalVector) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Vetor:</span>
-                                    <%= incident.TechnicalVector %>
+                                    <%= incident.technicalVector %>
                                 </p>
                                 <% } %>
-                                <% if (incident.RealRisk) { %>
+                                <% if (incident.realRisk) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Risco real:</span>
-                                    <%= incident.RealRisk %>
+                                    <%= incident.realRisk %>
                                 </p>
                                 <% } %>
-                                <% if (incident.DetectionSignal) { %>
+                                <% if (incident.detectionSignal) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Sinal:</span>
-                                    <%= incident.DetectionSignal %>
+                                    <%= incident.detectionSignal %>
                                 </p>
                                 <% } %>
-                                <% if (incident.RecommendedAction) { %>
+                                <% if (incident.recommendedAction) { %>
                                 <p>
                                     <span class="text-pink-200 font-bold">Ação:</span>
-                                    <%= incident.RecommendedAction %>
+                                    <%= incident.recommendedAction %>
                                 </p>
                                 <% } %>
                             </div>
@@ -112,27 +112,27 @@
                     <% } %>
                 </div>
 
-                <% if ((it.EmergingPatterns && it.EmergingPatterns.length) || (it.ActionableInsights && it.ActionableInsights.length)) { %>
+                <% if ((it.emergingPatterns && it.emergingPatterns.length) || (it.actionableInsights && it.actionableInsights.length)) { %>
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <% if (it.EmergingPatterns && it.EmergingPatterns.length) { %>
+                    <% if (it.emergingPatterns && it.emergingPatterns.length) { %>
                     <div class="bg-surface-container-low p-5 rounded-xl border border-pink-500/15">
                         <p class="font-headline font-bold text-pink-200">
                             Padrões emergentes
                         </p>
                         <div class="mt-3 space-y-2 text-sm text-stone-300">
-                            <% for (const p of it.EmergingPatterns) { %>
+                            <% for (const p of it.emergingPatterns) { %>
                             <p>• <%= p %></p>
                             <% } %>
                         </div>
                     </div>
                     <% } %>
-                    <% if (it.ActionableInsights && it.ActionableInsights.length) { %>
+                    <% if (it.actionableInsights && it.actionableInsights.length) { %>
                     <div class="bg-surface-container-low p-5 rounded-xl border border-pink-500/15">
                         <p class="font-headline font-bold text-pink-200">
                             Insights acionáveis
                         </p>
                         <div class="mt-3 space-y-2 text-sm text-stone-300">
-                            <% for (const insight of it.ActionableInsights) { %>
+                            <% for (const insight of it.actionableInsights) { %>
                             <p>• <%= insight %></p>
                             <% } %>
                         </div>

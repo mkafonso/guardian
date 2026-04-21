@@ -1,4 +1,4 @@
-<% if (it.SafeUpdates && it.SafeUpdates.length) { %>
+<% if (it.safeUpdates && it.safeUpdates.length) { %>
         <section class="mb-32">
             <div class="flex items-center gap-3 mb-8">
                 <span class="h-px flex-grow bg-outline-variant/30"></span>
@@ -21,17 +21,17 @@
                 <p class="text-stone-500 mb-2 font-sans text-xs uppercase tracking-wider">
                     Comando para atualizar
                 </p>
-                <% if (it.NpmInstallCmd) { %>
+                <% if (it.npmInstallCmd) { %>
                 <p class="text-stone-400">
-                    <span class="text-primary">$</span> <%= it.NpmInstallCmd %>
+                    <span class="text-primary">$</span> <%= it.npmInstallCmd %>
                 </p>
                 <% } %>
-                <% if (it.NpmInstallDevCmd) { %>
+                <% if (it.npmInstallDevCmd) { %>
                 <p class="text-stone-400 mt-2">
-                    <span class="text-primary">$</span> <%= it.NpmInstallDevCmd %>
+                    <span class="text-primary">$</span> <%= it.npmInstallDevCmd %>
                 </p>
                 <% } %>
-                <% if (!it.NpmInstallCmd && !it.NpmInstallDevCmd) { %>
+                <% if (!it.npmInstallCmd && !it.npmInstallDevCmd) { %>
                 <p class="text-stone-400 italic">Nenhuma atualização pendente</p>
                 <% } %>
             </div>
@@ -46,18 +46,18 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant/10 text-sm">
-                        <% for (const row of it.SafeUpdates) { %>
+                        <% for (const row of it.safeUpdates) { %>
                         <tr class="hover:bg-surface-container/50 transition-colors group">
                             <td class="px-6 py-5 font-bold text-on-surface">
-                                <%= row.PackageName %>
+                                <%= row.packageName %>
                             </td>
-                            <td class="px-6 py-5 text-stone-500">v<%= row.CurrentVersion %></td>
-                            <td class="px-6 py-5 text-primary">v<%= row.LatestVersion %></td>
+                            <td class="px-6 py-5 text-stone-500">v<%= row.currentVersion %></td>
+                            <td class="px-6 py-5 text-primary">v<%= row.latestVersion %></td>
                             <td class="px-6 py-5">
                                 <span
-                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= row.Color %>/10 text-<%= row.Color %> text-[10px] font-bold border border-<%= row.Color %>/20">
-                                    <span class="w-1 h-1 rounded-full bg-<%= row.Color %>"></span>
-                                    <%= row.RiskLevel %>
+                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= row.color %>/10 text-<%= row.color %> text-[10px] font-bold border border-<%= row.color %>/20">
+                                    <span class="w-1 h-1 rounded-full bg-<%= row.color %>"></span>
+                                    <%= row.riskLevel %>
                                 </span>
                             </td>
                         </tr>
