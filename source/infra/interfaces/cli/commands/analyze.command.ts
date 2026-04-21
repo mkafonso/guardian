@@ -10,7 +10,6 @@ import { StaticMaintenanceAnalysisService } from '@/core/services/static-mainten
 import { UpgradePlanningService } from '@/core/services/upgrade-planning.service'
 import { AnalyzeProjectDependenciesUseCase } from '@/core/usecases/analyze-project-dependencies.usecase'
 import { AssessDependencyRisksUseCase } from '@/core/usecases/assess-dependency-risks.usecase'
-import { BuildGuardianReportUseCase } from '@/core/usecases/build-guardian-report.usecase'
 import { CollectSecurityIncidentsUseCase } from '@/core/usecases/collect-security-incidents.usecase'
 import { PlanDependencyActionsUseCase } from '@/core/usecases/plan-dependency-actions.usecase'
 import { FileSystemProjectManifestReaderAdapter } from '@/infra/package-managers/file-system-project-manifest-reader.adapter'
@@ -22,6 +21,8 @@ import { OsvVulnerabilityDataSourceAdapter } from '@/infra/vulnerabilities/osv-v
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import pc from 'picocolors'
+import yoctoSpinner from 'yocto-spinner'
 
 type AnalyzeCommandOptions = {
   projectPath: string
@@ -36,74 +37,8 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
   const projectPath = path.resolve(process.cwd(), options.projectPath)
   const outputPath = path.resolve(process.cwd(), options.outputPath)
 
-  console.log(`guardian: analyzing project at "${projectPath}"...`)
+  console.log(pc.dim(`guardian: analyzing project at "${projectPath}"`))
 
-  const useCase = createBuildGuardianReportUseCase()
-
-  const result = await useCase.execute({
-    projectPath,
-    includeReachability: options.includeReachability,
-    includeSecurityIncidents: options.includeSecurityIncidents,
-  })
-
-  await ensureParentDirectoryExists(outputPath)
-  await writeFile(outputPath, result.html, 'utf8')
-
-  console.log('guardian: report generated successfully')
-  console.log(`guardian: output -> ${outputPath}`)
-}
-
-function parseAnalyzeCommandOptions(args: string[]): AnalyzeCommandOptions {
-  let projectPath = '.'
-  let outputPath = 'guardian-report.html'
-  let includeSecurityIncidents = true
-  let includeReachability = true
-
-  for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index]
-
-    if (!arg) {
-      continue
-    }
-
-    if (arg === '--no-incidents') {
-      includeSecurityIncidents = false
-      continue
-    }
-
-    if (arg === '--no-reachability') {
-      includeReachability = false
-      continue
-    }
-
-    if (arg === '--output' || arg === '-o') {
-      const value = args[index + 1]
-
-      if (!value || value.startsWith('-')) {
-        throw new Error('Missing value for --output option.')
-      }
-
-      outputPath = value
-      index += 1
-      continue
-    }
-
-    if (arg.startsWith('-')) {
-      throw new Error(`Unknown option "${arg}".`)
-    }
-
-    projectPath = arg
-  }
-
-  return {
-    projectPath,
-    outputPath,
-    includeSecurityIncidents,
-    includeReachability,
-  }
-}
-
-function createBuildGuardianReportUseCase(): BuildGuardianReportUseCase {
   const dependencyClassificationService = new DependencyClassificationService()
   const riskScoringService = new RiskScoringService()
   const upgradePlanningService = new UpgradePlanningService()
@@ -159,15 +94,196 @@ function createBuildGuardianReportUseCase(): BuildGuardianReportUseCase {
     undefined,
   )
 
-  return new BuildGuardianReportUseCase(
-    analyzeProjectDependenciesUseCase,
-    assessDependencyRisksUseCase,
-    planDependencyActionsUseCase,
-    collectSecurityIncidentsUseCase,
-    securityScoreService,
-    guardianReportViewModelBuilderService,
-    reportTemplateRenderer,
+  const analyzed = await runStep(
+    'lendo package.json e dependências...',
+    () => {
+      return pc.green('inventário carregado')
+    },
+    async () => {
+      return await analyzeProjectDependenciesUseCase.execute({ projectPath })
+    },
   )
+
+  const assessed = await runStep(
+    'consultando vulnerabilidades...',
+    () => {
+      const total = analyzed.dependencies.reduce((sum, item) => sum + 1, 0)
+      const vulns = analyzed.dependencies.length
+      return pc.green(`análise concluída (${total} deps / ${vulns} packages)`)
+    },
+    async () => {
+      return await assessDependencyRisksUseCase.execute({
+        projectPath,
+        dependencies: analyzed.dependencies,
+        includeReachability: options.includeReachability,
+      })
+    },
+  )
+
+  const plannedActions = await runStep(
+    'planejando ações...',
+    () => {
+      const vulns = assessed.assessedRisks.reduce(
+        (sum, item) => sum + item.vulnerabilities.length,
+        0,
+      )
+      return pc.green(`${vulns} vulnerabilidades encontradas`)
+    },
+    async () => {
+      return await planDependencyActionsUseCase.execute({
+        manifest: analyzed.manifest,
+        dependencies: analyzed.dependencies,
+        assessedRisks: assessed.assessedRisks,
+      })
+    },
+  )
+
+  const incidents = options.includeSecurityIncidents
+    ? await runStep(
+        'consultando radar de incidentes...',
+        () => {
+          return pc.green('radar carregado')
+        },
+        async () => {
+          return await collectSecurityIncidentsUseCase.execute({
+            dependencyNames: analyzed.dependencies.map(
+              (item) => item.inventory.name,
+            ),
+            ecosystem: 'npm',
+            limit: 8,
+          })
+        },
+      )
+    : {
+        incidents: [],
+        emergingPatterns: [],
+        actionableInsights: [],
+        error: null,
+      }
+
+  const levelCounts = securityScoreService.countByLevel(
+    assessed.assessedRisks.map((item) => item.riskLevel),
+  )
+
+  const securityScore = securityScoreService.handle({
+    dependencyScores: assessed.assessedRisks.map((item) => item.riskScore),
+    criticalRisksCount: levelCounts.critical,
+    highRisksCount: levelCounts.high,
+  })
+
+  const viewModel = guardianReportViewModelBuilderService.execute({
+    generatedAt: formatGeneratedAt(new Date()),
+    securityScoreText: securityScore.text,
+    securityScoreNum: securityScore.score,
+    securityColor: securityScore.color,
+    criticalRisks: plannedActions.criticalRisks,
+    maintenanceRisks: plannedActions.maintenanceRisks,
+    safeUpdates: plannedActions.safeUpdates,
+    npmInstallCmd: plannedActions.commands.npmInstallCmd,
+    npmInstallDevCmd: plannedActions.commands.npmInstallDevCmd,
+    npmInstallCriticalCmd: plannedActions.commands.npmInstallCriticalCmd,
+    npmInstallCriticalDevCmd: plannedActions.commands.npmInstallCriticalDevCmd,
+    npmCriticalNotes: plannedActions.commands.npmCriticalNotes,
+    securityIncidents: incidents.incidents,
+    securityIncidentsError: incidents.error,
+    emergingPatterns: incidents.emergingPatterns,
+    actionableInsights: incidents.actionableInsights,
+  })
+
+  const html = await runStep(
+    'gerando report HTML...',
+    () => {
+      return pc.green('HTML gerado')
+    },
+    async () => {
+      return await reportTemplateRenderer.render(viewModel)
+    },
+  )
+
+  await runStep(
+    'salvando report...',
+    () => {
+      return pc.green(
+        `report salvo em ${pc.bold(path.relative(process.cwd(), outputPath) || outputPath)}`,
+      )
+    },
+    async () => {
+      await ensureParentDirectoryExists(outputPath)
+      await writeFile(outputPath, html, 'utf8')
+    },
+  )
+}
+
+function runStep<T>(
+  text: string,
+  successText: (value: T) => string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const spinner = yoctoSpinner({ text: `${text}` }).start()
+
+  return fn()
+    .then((value) => {
+      spinner.success(`${successText(value)}`)
+      return value
+    })
+    .catch((error) => {
+      const message =
+        error instanceof Error && error.message.trim().length > 0
+          ? error.message.trim()
+          : 'erro inesperado'
+      spinner.error(`${pc.red('✖')} ${message}`)
+      throw error
+    })
+}
+
+function parseAnalyzeCommandOptions(args: string[]): AnalyzeCommandOptions {
+  let projectPath = '.'
+  let outputPath = 'guardian-report.html'
+  let includeSecurityIncidents = true
+  let includeReachability = true
+
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index]
+
+    if (!arg) {
+      continue
+    }
+
+    if (arg === '--no-incidents') {
+      includeSecurityIncidents = false
+      continue
+    }
+
+    if (arg === '--no-reachability') {
+      includeReachability = false
+      continue
+    }
+
+    if (arg === '--output' || arg === '-o') {
+      const value = args[index + 1]
+
+      if (!value || value.startsWith('-')) {
+        throw new Error('Missing value for --output option.')
+      }
+
+      outputPath = value
+      index += 1
+      continue
+    }
+
+    if (arg.startsWith('-')) {
+      throw new Error(`Unknown option "${arg}".`)
+    }
+
+    projectPath = arg
+  }
+
+  return {
+    projectPath,
+    outputPath,
+    includeSecurityIncidents,
+    includeReachability,
+  }
 }
 
 function resolveTemplatesPath(): string {
@@ -175,6 +291,13 @@ function resolveTemplatesPath(): string {
   const currentDirectoryPath = path.dirname(currentFilePath)
 
   return path.resolve(currentDirectoryPath, '../../../report/templates')
+}
+
+function formatGeneratedAt(date: Date): string {
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  }).format(date)
 }
 
 async function ensureParentDirectoryExists(filePath: string): Promise<void> {
