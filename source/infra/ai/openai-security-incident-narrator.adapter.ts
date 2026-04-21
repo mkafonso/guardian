@@ -6,7 +6,13 @@ import type {
 import type { SecurityIncidentRecord } from '@/core/ports/security-incidents-radar.port'
 import { buildSecurityIncidentNarrationPrompt } from '@/infra/ai/prompts/security-incident-narration.prompt'
 import { buildSecurityRadarSummaryPrompt } from '@/infra/ai/prompts/security-radar-summary.prompt'
-import OpenAI from 'openai'
+import {
+  extractOpenAIOutputText,
+  normalizeNullableText,
+  normalizeStringList,
+  parseJsonSafely,
+  resolveOpenAIHttpError,
+} from '@/infra/ai/utils'
 
 export type OpenAISecurityIncidentNarratorAdapterOptions = {
   apiKey: string
@@ -30,14 +36,12 @@ type RadarNarrationSchema = {
 export class OpenAISecurityIncidentNarratorAdapter
   implements SecurityIncidentNarratorPort
 {
-  private readonly client: OpenAI
+  private readonly apiKey: string
   private readonly model: string
   private readonly maxRetries: number
 
   constructor(options: OpenAISecurityIncidentNarratorAdapterOptions) {
-    this.client = new OpenAI({
-      apiKey: options.apiKey,
-    })
+    this.apiKey = options.apiKey
     this.model = options.model ?? 'gpt-4o-mini'
     this.maxRetries = options.maxRetries ?? 2
   }
@@ -73,11 +77,11 @@ export class OpenAISecurityIncidentNarratorAdapter
     })
 
     return {
-      summary: this.normalizeNullableText(parsed.summary),
-      technicalVector: this.normalizeNullableText(parsed.technicalVector),
-      realRisk: this.normalizeNullableText(parsed.realRisk),
-      detectionSignal: this.normalizeNullableText(parsed.detectionSignal),
-      recommendedAction: this.normalizeNullableText(parsed.recommendedAction),
+      summary: normalizeNullableText(parsed.summary),
+      technicalVector: normalizeNullableText(parsed.technicalVector),
+      realRisk: normalizeNullableText(parsed.realRisk),
+      detectionSignal: normalizeNullableText(parsed.detectionSignal),
+      recommendedAction: normalizeNullableText(parsed.recommendedAction),
     }
   }
 
@@ -109,11 +113,8 @@ export class OpenAISecurityIncidentNarratorAdapter
     })
 
     return {
-      emergingPatterns: this.normalizeStringList(parsed.emergingPatterns, 4),
-      actionableInsights: this.normalizeStringList(
-        parsed.actionableInsights,
-        4,
-      ),
+      emergingPatterns: normalizeStringList(parsed.emergingPatterns, 4),
+      actionableInsights: normalizeStringList(parsed.actionableInsights, 4),
     }
   }
 
@@ -122,19 +123,33 @@ export class OpenAISecurityIncidentNarratorAdapter
     schemaName: string
     schema: Record<string, unknown>
   }): Promise<T> {
-    const response = await this.client.responses.create({
-      model: this.model,
-      input: input.prompt,
-      text: {
-        format: {
-          type: 'json_schema',
-          name: input.schemaName,
-          schema: input.schema,
-        },
+    const response = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${this.apiKey}`,
+        'content-type': 'application/json',
       },
+      body: JSON.stringify({
+        model: this.model,
+        input: input.prompt,
+        text: {
+          format: {
+            type: 'json_schema',
+            name: input.schemaName,
+            schema: input.schema,
+          },
+        },
+      }),
     })
 
-    const output = response.output_text?.trim()
+    const rawBody = await response.text()
+
+    if (!response.ok) {
+      throw new Error(resolveOpenAIHttpError(response.status, rawBody))
+    }
+
+    const parsedBody = parseJsonSafely(rawBody)
+    const output = extractOpenAIOutputText(parsedBody)?.trim()
 
     if (!output) {
       throw new Error('OpenAI returned an empty structured response.')
@@ -181,47 +196,5 @@ export class OpenAISecurityIncidentNarratorAdapter
     }
 
     return new Error('Failed to narrate security incidents with OpenAI.')
-  }
-
-  private normalizeNullableText(
-    value: string | null | undefined,
-  ): string | null {
-    if (typeof value !== 'string') {
-      return null
-    }
-
-    const normalized = value.trim()
-    return normalized.length > 0 ? normalized : null
-  }
-
-  private normalizeStringList(
-    value: string[] | null | undefined,
-    limit: number,
-  ): string[] {
-    if (!Array.isArray(value)) {
-      return []
-    }
-
-    const unique = new Set<string>()
-
-    for (const item of value) {
-      if (typeof item !== 'string') {
-        continue
-      }
-
-      const normalized = item.trim()
-
-      if (!normalized) {
-        continue
-      }
-
-      unique.add(normalized)
-
-      if (unique.size >= limit) {
-        break
-      }
-    }
-
-    return [...unique]
   }
 }
