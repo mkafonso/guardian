@@ -38,7 +38,7 @@ export class OpenAISecurityIncidentNarratorAdapter
     this.client = new OpenAI({
       apiKey: options.apiKey,
     })
-    this.model = options.model ?? 'gpt-5.2-mini'
+    this.model = options.model ?? 'gpt-4o-mini'
     this.maxRetries = options.maxRetries ?? 2
   }
 
