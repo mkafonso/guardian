@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "eta": "4.5.1",
-    "openai": "6.34.0",
     "picocolors": "1.1.1",
     "yocto-spinner": "1.1.0"
   },

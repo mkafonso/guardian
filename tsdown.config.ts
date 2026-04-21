@@ -13,7 +13,7 @@ export default defineConfig({
   unbundle: true,
 
   deps: {
-    neverBundle: ['eta', 'openai', 'picocolors', 'yocto-spinner', 'dotenv'],
+    neverBundle: ['eta', 'picocolors', 'yocto-spinner'],
   },
 
   copy: [
