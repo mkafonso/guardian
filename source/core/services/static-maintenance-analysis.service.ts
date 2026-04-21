@@ -35,7 +35,7 @@ export type StaticMaintenanceAnalysisInput = {
 }
 
 export class StaticMaintenanceAnalysisService {
-  public execute(
+  public handle(
     input: StaticMaintenanceAnalysisInput,
   ): StaticMaintenanceFinding[] {
     const dependencyNames = this.normalizeDependencyNames(input.dependencyNames)
