@@ -10,9 +10,8 @@
     "verbatimModuleSyntax": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["source/*"]
+      "@/*": ["./source/*"]
     }
   },
   "include": ["source/**/*.ts", "tests/**/*.ts", "tsdown.config.ts"]
