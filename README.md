@@ -1,7 +1,3 @@
-<p align="center">
-  <img align="center" width="70%" src="./examples/basic/image.png">
-</p>
-
 <h1 align="center">Guardian</h1>
 
 <p align="center">
@@ -59,12 +55,13 @@ Tudo focado em responder:
 ## Instalação
 
 ```bash
-npm install -g guardian
+npm install -g @mkafonso/guardian
 ```
 
 ou
 
 ```bash
+# Executar na raiz do teu projeto
 npx guardian analyze
 ```
 
@@ -99,7 +96,7 @@ guardian-report.html
 ```
 
 <p align="center">
-  <img width="80%" src="./examples/vulnerable/image.png" />
+  <img width="80%"  alt="image" src="https://github.com/user-attachments/assets/1eb004f8-f021-41fd-9683-7876b64bc437" />
 </p>
 
 <br />
