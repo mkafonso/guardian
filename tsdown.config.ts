@@ -2,7 +2,6 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: ['source/infra/interfaces/cli/index.ts'],
-
   format: ['esm'],
   dts: false,
   sourcemap: true,
@@ -14,7 +13,7 @@ export default defineConfig({
   unbundle: true,
 
   deps: {
-    neverBundle: ['eta', 'picocolors', 'yocto-spinner'],
+    neverBundle: ['eta'],
   },
 
   copy: [
