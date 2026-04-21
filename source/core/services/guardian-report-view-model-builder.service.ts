@@ -19,6 +19,7 @@ export type GuardianReportViewModelBuilderInput = {
   npmInstallCriticalCmd: string | null
   npmInstallCriticalDevCmd: string | null
   npmCriticalNotes: string[]
+  showIncidentsRadar: boolean
   securityIncidents: SecurityIncidentCardViewModel[]
   securityIncidentsError: string | null
   emergingPatterns: string[]
@@ -50,6 +51,7 @@ export class GuardianReportViewModelBuilderService {
       npmInstallCriticalDevCmd: input.npmInstallCriticalDevCmd,
       npmCriticalNotes: [...input.npmCriticalNotes],
 
+      showIncidentsRadar: input.showIncidentsRadar,
       securityIncidents: [...input.securityIncidents],
       securityIncidentsError: input.securityIncidentsError,
       emergingPatterns: [...input.emergingPatterns],

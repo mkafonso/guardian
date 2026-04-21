@@ -94,6 +94,7 @@ export class BuildGuardianReportUseCase {
       npmInstallCriticalDevCmd:
         plannedActions.commands.npmInstallCriticalDevCmd,
       npmCriticalNotes: plannedActions.commands.npmCriticalNotes,
+      showIncidentsRadar: input.includeSecurityIncidents !== false,
       securityIncidents: securityIncidents.incidents,
       securityIncidentsError: securityIncidents.error,
       emergingPatterns: securityIncidents.emergingPatterns,
