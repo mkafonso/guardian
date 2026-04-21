@@ -13,7 +13,7 @@ export default defineConfig({
   unbundle: true,
 
   deps: {
-    neverBundle: ['eta'],
+    neverBundle: ['eta', 'dotenv'],
   },
 
   copy: [
