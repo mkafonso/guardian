@@ -1,0 +1,69 @@
+<% if (it.SafeUpdates && it.SafeUpdates.length) { %>
+        <section class="mb-32">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+                <h2 class="font-headline text-sm uppercase tracking-[0.2em] text-stone-400">
+                    Atualizações seguras (em lote)
+                </h2>
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+            </div>
+
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="font-headline text-xl font-bold">
+                    Atualizações Seguras (Sem quebra)
+                </h2>
+                <button class="text-xs text-primary font-bold uppercase tracking-widest hover:underline transition-all">
+                    Atualizar todas as seguras
+                </button>
+            </div>
+            <div
+                class="mb-6 bg-surface-container-lowest p-4 rounded-lg font-mono text-sm border border-outline-variant/10">
+                <p class="text-stone-500 mb-2 font-sans text-xs uppercase tracking-wider">
+                    Comando para atualizar
+                </p>
+                <% if (it.NpmInstallCmd) { %>
+                <p class="text-stone-400">
+                    <span class="text-primary">$</span> <%= it.NpmInstallCmd %>
+                </p>
+                <% } %>
+                <% if (it.NpmInstallDevCmd) { %>
+                <p class="text-stone-400 mt-2">
+                    <span class="text-primary">$</span> <%= it.NpmInstallDevCmd %>
+                </p>
+                <% } %>
+                <% if (!it.NpmInstallCmd && !it.NpmInstallDevCmd) { %>
+                <p class="text-stone-400 italic">Nenhuma atualização pendente</p>
+                <% } %>
+            </div>
+            <div class="bg-surface-container-low rounded-xl overflow-hidden shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-surface-container uppercase text-[10px] font-bold tracking-widest text-stone-500">
+                            <th class="px-6 py-4">Pacote</th>
+                            <th class="px-6 py-4">Atual</th>
+                            <th class="px-6 py-4">Última</th>
+                            <th class="px-6 py-4">Nível de risco</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10 text-sm">
+                        <% for (const row of it.SafeUpdates) { %>
+                        <tr class="hover:bg-surface-container/50 transition-colors group">
+                            <td class="px-6 py-5 font-bold text-on-surface">
+                                <%= row.PackageName %>
+                            </td>
+                            <td class="px-6 py-5 text-stone-500">v<%= row.CurrentVersion %></td>
+                            <td class="px-6 py-5 text-primary">v<%= row.LatestVersion %></td>
+                            <td class="px-6 py-5">
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= row.Color %>/10 text-<%= row.Color %> text-[10px] font-bold border border-<%= row.Color %>/20">
+                                    <span class="w-1 h-1 rounded-full bg-<%= row.Color %>"></span>
+                                    <%= row.RiskLevel %>
+                                </span>
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+<% } %>

@@ -1,0 +1,155 @@
+        <section
+            class="mb-32 relative overflow-hidden rounded-2xl border border-pink-500/25 bg-gradient-to-br from-pink-500/15 via-fuchsia-500/10 to-surface-container-low shadow-2xl">
+            <div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-pink-500/20 blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-fuchsia-500/15 blur-3xl"></div>
+
+            <div class="relative p-8">
+                <div class="flex items-start justify-between gap-6 flex-wrap mb-10">
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="material-symbols-outlined text-pink-300 bg-pink-500/10 border border-pink-500/20 rounded-xl p-2">campaign</span>
+                            <h2 class="font-headline text-2xl font-bold text-on-surface">
+                                Radar de Incidentes
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (it.SecurityIncidentsError) { %>
+                <div class="mt-6 rounded-xl bg-secondary/10 border border-secondary/20 p-5 text-stone-200">
+                    <p class="font-headline font-bold text-secondary">
+                        Radar indisponível
+                    </p>
+                    <p class="mt-2 text-sm text-stone-300">
+                        <%= it.SecurityIncidentsError %>
+                    </p>
+                </div>
+                <% } else if (it.SecurityIncidents && it.SecurityIncidents.length) { %>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% for (const incident of it.SecurityIncidents) { %>
+                    <details
+                        class="group rounded-xl border border-pink-500/15 bg-surface-container-low shadow-sm hover:shadow-xl hover:border-pink-500/30 transition-all">
+                        <summary class="cursor-pointer list-none p-5 flex items-start justify-between gap-4">
+                            <div class="min-w-0">
+                                <p class="font-headline text-lg font-bold text-on-surface truncate">
+                                    <%= incident.Title %>
+                                </p>
+                                <div class="mt-2 flex items-center gap-2 flex-wrap">
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-200 text-[10px] font-bold border border-pink-500/20 uppercase tracking-widest">
+                                        <%= incident.Type %>
+                                    </span>
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-<%= incident.BadgeColor %>/10 text-<%= incident.BadgeColor %> text-[10px] font-bold border border-<%= incident.BadgeColor %>/20 uppercase tracking-widest">
+                                        <span class="w-1 h-1 rounded-full bg-<%= incident.BadgeColor %>"></span>
+                                        <%= incident.Severity %>
+                                    </span>
+                                    <span class="text-[10px] uppercase tracking-widest text-stone-500">confiança: <%= incident.Confidence %></span>
+                                </div>
+                            </div>
+
+                            <span
+                                class="material-symbols-outlined text-pink-200/80 group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+
+                        <div class="px-5 pb-5 pt-0 border-t border-pink-500/10">
+                            <% if (incident.AffectedEcosystem && incident.AffectedEcosystem.length) { %>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                <% for (const eco of incident.AffectedEcosystem) { %>
+                                <span
+                                    class="px-2 py-0.5 rounded-full bg-pink-500/10 text-pink-200 text-[10px] font-bold border border-pink-500/20"><%= eco %></span>
+                                <% } %>
+                            </div>
+                            <% } %>
+                            <% if (incident.Summary) { %>
+                            <p class="mt-4 text-stone-300 text-sm leading-relaxed">
+                                <%= incident.Summary %>
+                            </p>
+                            <% } %>
+
+                            <div class="mt-4 space-y-3 text-sm text-stone-300 leading-relaxed">
+                                <% if (incident.OccurredAt) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Quando:</span>
+                                    <%= incident.OccurredAt %>
+                                </p>
+                                <% } %>
+                                <% if (incident.SourceURL) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Fonte:</span>
+                                    <a class="text-primary underline decoration-primary/40 hover:decoration-primary"
+                                        href="<%= incident.SourceURL %>" target="_blank" rel="noreferrer"><%= incident.SourceURL %></a>
+                                </p>
+                                <% } %>
+                                <% if (incident.TechnicalVector) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Vetor:</span>
+                                    <%= incident.TechnicalVector %>
+                                </p>
+                                <% } %>
+                                <% if (incident.RealRisk) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Risco real:</span>
+                                    <%= incident.RealRisk %>
+                                </p>
+                                <% } %>
+                                <% if (incident.DetectionSignal) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Sinal:</span>
+                                    <%= incident.DetectionSignal %>
+                                </p>
+                                <% } %>
+                                <% if (incident.RecommendedAction) { %>
+                                <p>
+                                    <span class="text-pink-200 font-bold">Ação:</span>
+                                    <%= incident.RecommendedAction %>
+                                </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </details>
+                    <% } %>
+                </div>
+
+                <% if ((it.EmergingPatterns && it.EmergingPatterns.length) || (it.ActionableInsights && it.ActionableInsights.length)) { %>
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <% if (it.EmergingPatterns && it.EmergingPatterns.length) { %>
+                    <div class="bg-surface-container-low p-5 rounded-xl border border-pink-500/15">
+                        <p class="font-headline font-bold text-pink-200">
+                            Padrões emergentes
+                        </p>
+                        <div class="mt-3 space-y-2 text-sm text-stone-300">
+                            <% for (const p of it.EmergingPatterns) { %>
+                            <p>• <%= p %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+                    <% if (it.ActionableInsights && it.ActionableInsights.length) { %>
+                    <div class="bg-surface-container-low p-5 rounded-xl border border-pink-500/15">
+                        <p class="font-headline font-bold text-pink-200">
+                            Insights acionáveis
+                        </p>
+                        <div class="mt-3 space-y-2 text-sm text-stone-300">
+                            <% for (const insight of it.ActionableInsights) { %>
+                            <p>• <%= insight %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+                <% } %>
+                <% } else { %>
+                <div class="mt-6 rounded-xl bg-pink-500/10 border border-pink-500/20 p-5 text-stone-200">
+                    <p class="font-headline font-bold text-pink-200">
+                        Nenhum incidente retornado
+                    </p>
+                    <p class="mt-2 text-sm text-stone-300">
+                        Gere o report com OPENAI_API_KEY configurada para preencher esta
+                        seção automaticamente.
+                    </p>
+                </div>
+                <% } %>
+            </div>
+        </section>

@@ -1,0 +1,48 @@
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <span class="material-symbols-outlined text-4xl">check_circle</span>
+                </div>
+                <p class="font-label text-xs uppercase tracking-widest text-primary mb-1">
+                    Atualizações Seguras
+                </p>
+                <p class="font-headline text-4xl font-bold text-on-surface">
+                    <%= it.SafeUpdatesCount %>
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                    Prontas para implantação imediata
+                </div>
+            </div>
+            <div
+                class="bg-surface-container-low p-6 rounded-xl border-t border-secondary/20 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <span class="material-symbols-outlined text-4xl text-secondary">warning</span>
+                </div>
+                <p class="font-label text-xs uppercase tracking-widest text-secondary mb-1">
+                    Riscos Críticos
+                </p>
+                <p class="font-headline text-4xl font-bold text-on-surface">
+                    <%= it.CriticalRisksCount %>
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    Vulnerabilidade alta detectada
+                </div>
+            </div>
+            <div class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <span class="material-symbols-outlined text-4xl text-tertiary">error</span>
+                </div>
+                <p class="font-label text-xs uppercase tracking-widest text-tertiary mb-1">
+                    Manutenção
+                </p>
+                <p class="font-headline text-4xl font-bold text-on-surface">
+                    <%= it.MaintenanceCount %>
+                </p>
+                <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+                    <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                    Avisos de divergência de versão
+                </div>
+            </div>
+        </section>

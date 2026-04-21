@@ -1,0 +1,137 @@
+<% if (it.CriticalRisks && it.CriticalRisks.length) { %>
+        <section class="mb-32">
+            <div class="flex items-center gap-3 mb-12">
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+                <h2 class="font-headline text-sm uppercase tracking-[0.2em] text-stone-400">
+                    Atualizar pra ontem...
+                </h2>
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <% for (const risk of it.CriticalRisks) { %>
+                <div class="collapsible-card bg-surface-container p-8 rounded-xl border-l-2 border-<%= risk.Color %> shadow-xl"
+                    data-collapsible-card aria-expanded="false" tabindex="0" role="button">
+                    <div class="flex justify-between items-start gap-6">
+                        <div>
+                            <span
+                                class="bg-<%= risk.Color %>/10 text-<%= risk.Color %> text-[10px] px-2 py-1 rounded font-bold border border-<%= risk.Color %>/20"><%= risk.CVE %></span>
+                            <h3 class="font-headline text-2xl font-bold mt-2">
+                                <%= risk.PackageName %>
+                            </h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-stone-500 font-mono text-sm text-right">v<%= risk.CurrentVersion %> →
+                                <span class="text-primary font-bold">v<%= risk.TargetVersion %></span></span>
+                            <span
+                                class="collapsible-chevron material-symbols-outlined text-stone-500">expand_more</span>
+                        </div>
+                    </div>
+
+                    <div class="collapsible-placeholder">
+                        <p class="text-stone-500 text-sm italic">
+                            Clique no card para ver os detalhes.
+                        </p>
+                    </div>
+
+                    <div class="collapsible-content">
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <p class="font-label text-[10px] uppercase text-stone-500 mb-1">
+                                    Por que isso importa
+                                </p>
+                                <p class="text-stone-300 text-sm leading-relaxed">
+                                    <%= risk.WhyItMatters %>
+                                </p>
+                            </div>
+
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-stone-500 text-base">arrow_right</span>
+                                <div>
+                                    <p class="text-stone-300 font-bold">Como acontece</p>
+                                    <p class="text-stone-400 leading-relaxed text-sm">
+                                        <%= risk.HowItHappens %>
+                                    </p>
+                                </div>
+                            </div>
+                            <% if (risk.ExploitSample) { %>
+                            <div class="mt-2 ml-7">
+                                <p class="font-label text-[10px] uppercase text-stone-500 mb-1 tracking-wider">
+                                    Exemplo de exploração (simplificado)
+                                </p>
+                                <pre
+                                    class="bg-surface-container-lowest border border-outline-variant/15 rounded-lg p-3 text-xs font-mono text-stone-300 overflow-x-auto"><code><%= risk.ExploitSample %></code></pre>
+                            </div>
+                            <% } %>
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-stone-500 text-base">arrow_right</span>
+                                <div>
+                                    <p class="text-stone-300 font-bold">Impacto</p>
+                                    <p class="text-stone-400 leading-relaxed text-sm">
+                                        <%= risk.Impact %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-stone-500 text-base">arrow_right</span>
+                                <div>
+                                    <p class="text-stone-300 font-bold">Ação</p>
+                                    <p class="text-stone-400 leading-relaxed text-sm">
+                                        <%= risk.Action %>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <p class="font-label text-[10px] uppercase text-stone-500 mb-2 tracking-wider">
+                                    Links de referência
+                                </p>
+                                <div class="flex flex-wrap gap-2 text-xs">
+                                    <% for (const link of risk.Links || []) { %>
+                                    <a class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-outline-variant/20 bg-surface-container-high text-stone-300 hover:text-on-surface transition-colors"
+                                        href="<%= link.URL %>" rel="noopener noreferrer" target="_blank"><%= link.Label %></a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+
+            <section
+                class="mt-12 bg-surface-container-lowest border border-outline-variant/10 rounded-xl overflow-hidden">
+                <div class="bg-surface-container-high px-4 py-2 flex items-center justify-between">
+                    <div class="flex gap-1.5">
+                        <div class="w-3 h-3 rounded-full bg-secondary/30"></div>
+                        <div class="w-3 h-3 rounded-full bg-tertiary/30"></div>
+                        <div class="w-3 h-3 rounded-full bg-primary/30"></div>
+                    </div>
+                    <p class="font-label text-[10px] text-stone-500 tracking-widest uppercase">
+                        Executar na raiz do teu projeto
+                    </p>
+                    <div class="w-6"></div>
+                </div>
+                <div class="p-6 font-mono text-sm space-y-2">
+                    <p class="text-stone-600"># Iniciando auditoria forense...</p>
+                    <p class="text-stone-400">
+                        <span class="text-primary">$</span> npm audit --audit-level=high
+                    </p>
+                    <p class="text-stone-500 mt-2">
+                        encontradas <%= it.CriticalRisksCount %> vulnerabilidades de alta
+                        severidade
+                    </p>
+                    <% for (const note of it.NpmCriticalNotes || []) { %>
+                    <p class="text-stone-600"><%= note %></p>
+                    <% } %>
+                    <p class="text-stone-400">
+                        <span class="text-primary">$</span> <%= it.NpmInstallCriticalCmd || 'npm audit fix' %>
+                    </p>
+                    <% if (it.NpmInstallCriticalDevCmd) { %>
+                    <p class="text-stone-400">
+                        <span class="text-primary">$</span> <%= it.NpmInstallCriticalDevCmd %>
+                    </p>
+                    <% } %>
+                </div>
+            </section>
+        </section>
+<% } %>

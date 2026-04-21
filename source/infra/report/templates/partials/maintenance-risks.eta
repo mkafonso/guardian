@@ -1,0 +1,55 @@
+<% if (it.MaintenanceRisks && it.MaintenanceRisks.length) { %>
+        <section class="mb-32">
+            <div class="flex items-center gap-3 mb-12">
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+                <h2 class="font-headline text-sm uppercase tracking-[0.2em] text-stone-400">
+                    Vale a pena prestar atenção...
+                </h2>
+                <span class="h-px flex-grow bg-outline-variant/30"></span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <% for (const m of it.MaintenanceRisks) { %>
+                <div
+                    class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-sm flex flex-col">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-outline-variant/10 text-stone-400 text-[10px] font-bold border border-outline-variant/10 uppercase tracking-widest"><%= m.Tag %></span>
+                            <h3 class="font-headline text-xl font-bold mt-3">
+                                <%= m.PackageName %>
+                            </h3>
+                        </div>
+                        <span class="material-symbols-outlined text-stone-500"><%= m.Icon %></span>
+                    </div>
+
+                    <p class="text-stone-400 text-sm leading-relaxed mt-4 flex-1">
+                        <%= m.Description %>
+                    </p>
+
+                    <div class="mt-5 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10">
+                        <p class="font-label text-[10px] uppercase tracking-widest text-primary mb-2">
+                            Recomendação do Guardian
+                        </p>
+                        <p class="text-stone-400 text-sm leading-relaxed">
+                            <%= m.Recommendation %>
+                        </p>
+                        <% if (m.Alternatives && m.Alternatives.length) { %>
+                        <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                            <% for (const alt of m.Alternatives) { %>
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-outline-variant/20 bg-surface-container-high text-stone-300"><%= alt %></span>
+                            <% } %>
+                        </div>
+                        <% } %>
+                        <% for (const cmd of m.Commands || []) { %>
+                        <div class="mt-3 font-mono text-sm text-primary-fixed">
+                            <code><%= cmd %></code>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </section>
+<% } %>
