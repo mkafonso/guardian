@@ -50,16 +50,23 @@ export class RiskScoringService {
     isProductionDependency: boolean
     isExposed?: boolean
   }): DependencyRiskScoreResult {
-    const baseScore = this.calculateBaseScore(input.vulnerabilities)
-    const contextualScore = this.calculateContextualScore({
-      reachabilityFinding: input.reachabilityFinding,
-      isDirectDependency: input.isDirectDependency,
-      isProductionDependency: input.isProductionDependency,
-      isExposed: input.isExposed ?? false,
-    })
+    const hasVulnerabilities = input.vulnerabilities.length > 0
+
+    const baseScore = hasVulnerabilities
+      ? this.calculateBaseScore(input.vulnerabilities)
+      : 0
+
+    const contextualScore = hasVulnerabilities
+      ? this.calculateContextualScore({
+          reachabilityFinding: input.reachabilityFinding ?? null,
+          isDirectDependency: input.isDirectDependency,
+          isProductionDependency: input.isProductionDependency,
+          isExposed: input.isExposed ?? false,
+        })
+      : 0
 
     const score = this.clampScore(baseScore + contextualScore)
-    const level = this.resolveRiskLevel(score)
+    const level = hasVulnerabilities ? this.resolveRiskLevel(score) : 'low'
 
     return {
       score,
