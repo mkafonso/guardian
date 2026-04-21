@@ -1,5 +1,5 @@
 {
-  "name": "guardian",
+  "name": "@mkafonso/guardian",
   "version": "0.1.0",
   "description": "A CLI tool that analyzes Node.js dependencies, prioritizes risks, and generates actionable HTML reports.",
   "license": "MIT",
