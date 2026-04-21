@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-lint:
+    name: Test & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          echo "::group::npm ci"
+          npm ci
+          echo "::endgroup::"
+
+      - name: Lint
+        env:
+          FORCE_COLOR: "3"
+        run: |
+          set -euo pipefail
+          echo "::group::npm run lint"
+          npm run lint
+          echo "::endgroup::"
+
+      - name: Tests
+        env:
+          FORCE_COLOR: "3"
+        run: |
+          set -euo pipefail
+          echo "::group::npm test"
+          npm test -- --run
+          echo "::endgroup::"
