@@ -1,23 +1,19 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "ES2023",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "strict": true,
-    "resolveJsonModule": true,
-    "removeComments": true,
-    "newLine": "lf",
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
     "skipLibCheck": true,
-    "lib": ["ESNext"],
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./source/*"]
-    },
-    "types": ["node", "vitest/globals"]
-  }
+      "@/*": ["source/*"]
+    }
+  },
+  "include": ["source/**/*.ts", "tests/**/*.ts", "tsdown.config.ts"]
 }
