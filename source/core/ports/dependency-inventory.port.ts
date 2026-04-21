@@ -4,6 +4,7 @@ export type DependencyInventoryItem = {
   name: string
   version: string
   latestVersion: string | null
+  deprecatedMessage: string | null
   type: DependencyType
   packageManager: 'npm' | 'yarn' | 'pnpm' | 'unknown'
   path: string

@@ -6,6 +6,7 @@ export type PackageVersionMetadata = {
 export type PackageRegistryMetadata = {
   name: string
   latestVersion: string | null
+  deprecatedMessage: string | null
   homepageUrl: string | null
   repositoryUrl: string | null
   license: string | null
