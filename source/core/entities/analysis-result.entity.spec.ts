@@ -153,7 +153,11 @@ describe('AnalysisResultEntity', () => {
     expect(depsA).not.toBe(depsB)
     expect(depsA[0]).not.toBe(depsB[0])
 
-    depsA[0].name = 'hack'
+    const firstDep = depsA[0]
+    if (!firstDep) {
+      throw new Error('Expected dependencies[0] to be defined.')
+    }
+    firstDep.name = 'hack'
     expect(entity.dependencies[0]?.name).toBe('Lodash')
   })
 

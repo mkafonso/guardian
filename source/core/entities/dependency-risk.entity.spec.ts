@@ -103,7 +103,11 @@ describe('DependencyRiskEntity', () => {
 
     const vulns = entity.vulnerabilities
     vulns.push({ ...baseVulnerability, title: 'hack' })
-    vulns[0].title = 'hack'
+    const firstVuln = vulns[0]
+    if (!firstVuln) {
+      throw new Error('Expected vulnerabilities[0] to be defined.')
+    }
+    firstVuln.title = 'hack'
 
     expect(entity.vulnerabilities).toHaveLength(1)
     expect(entity.vulnerabilities[0]?.title).toBe('Prototype Pollution')
