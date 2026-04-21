@@ -6,31 +6,28 @@
 
 <p align="center">
   <a href="https://github.com/mkafonso/guardian">GitHub</a> -
-  <a href="#-uso">Uso</a> -
-  <a href="#-instalação">Instalação</a>
+  <a href="#instalacao">Instalação</a> -
+  <a href="#uso-rapido">Uso rápido</a> -
+  <a href="#opcoes">Opções</a> -
+  <a href="#ia">IA</a>
 </p>
 
 <span align="center">
 
-![npm](https://img.shields.io/npm/v/guardian)
-![license](https://img.shields.io/npm/l/guardian)
-![node](https://img.shields.io/node/v/guardian)
+![npm](https://img.shields.io/npm/v/@mkafonso/guardian)
+![license](https://img.shields.io/npm/l/@mkafonso/guardian)
+![node](https://img.shields.io/node/v/@mkafonso/guardian)
 
 </span>
 
 <br />
 <br />
 
-## Summary
+## Resumo
 
 O **Guardian** é uma CLI para análise de dependências que vai muito além do `npm audit`.
 
-Ele combina:
-
-- Análise de vulnerabilidades
-- Radar de incidentes reais da semana
-- Priorização inteligente de risco
-- Relatório visual em HTML
+Ele combina análise técnica (vulnerabilidades + reachability) com contexto do mundo real (incidentes recentes), e entrega um relatório HTML pronto para compartilhar.
 
 Tudo focado em responder:
 
@@ -49,6 +46,8 @@ Tudo focado em responder:
 - Relatório HTML bonito e pronto para compartilhar
 - Integração opcional com IA (OpenAI)
 
+<a id="instalacao"></a>
+
 <br />
 <br />
 
@@ -61,46 +60,68 @@ npm install -g @mkafonso/guardian
 ou
 
 ```bash
-# Executar na raiz do teu projeto
-npx guardian analyze
+npx @mkafonso/guardian analyze .
 ```
 
+<a id="uso-rapido"></a>
+
 <br />
 <br />
 
-## Uso
+## Uso rápido
 
-Dentro do seu projeto:
+Dentro do seu projeto (na raiz, ou passando o path):
 
 ```bash
-guardian analyze
+guardian analyze .
 ```
 
 Isso irá:
 
 - Ler seu `package.json`
-- Analisar dependências
-- Buscar incidentes recentes
-- Priorizar riscos
-- Gerar relatório
+- Detectar lockfiles (npm/yarn/pnpm)
+- Avaliar vulnerabilidades + reachability (quando possível)
+- Priorizar riscos e sugerir ações
+- Gerar o relatório HTML
 
 <br />
 <br />
-
 ## Output
 
-Um arquivo será gerado:
+Por padrão, um arquivo será gerado no diretório atual:
 
 ```bash
 guardian-report.html
 ```
 
+Abra no navegador e compartilhe com o time.
+
 <p align="center">
   <img width="80%"  alt="image" src="https://github.com/user-attachments/assets/1eb004f8-f021-41fd-9683-7876b64bc437" />
 </p>
 
+<a id="opcoes"></a>
+
 <br />
 <br />
+
+## Opções
+
+```bash
+guardian analyze [projectPath] [options]
+```
+
+- `--output, -o <file>`: caminho do HTML de saída
+- `--no-incidents`: desabilita o radar de incidentes
+- `--no-reachability`: desabilita a análise de reachability
+
+Exemplos:
+
+```bash
+guardian analyze
+guardian analyze .
+guardian analyze ./my-app --output guardian-report.html
+```
 
 ## Radar de Incidentes
 
@@ -114,6 +135,8 @@ O Guardian mostra automaticamente:
 Sempre focando nos:
 
 > **6 incidentes mais relevantes da semana**
+
+<a id="ia"></a>
 
 <br />
 <br />
