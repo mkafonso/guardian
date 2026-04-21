@@ -290,7 +290,7 @@ function resolveTemplatesPath(): string {
   const currentFilePath = fileURLToPath(import.meta.url)
   const currentDirectoryPath = path.dirname(currentFilePath)
 
-  return path.resolve(currentDirectoryPath, '../../../report/templates')
+  return path.resolve(currentDirectoryPath, '../infra/report/templates')
 }
 
 function formatGeneratedAt(date: Date): string {
