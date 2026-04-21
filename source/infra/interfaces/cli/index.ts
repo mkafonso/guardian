@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import 'dotenv/config'
+
 import { runCli } from './root'
 
 async function bootstrap(): Promise<void> {
