@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  entry: ['source/index.ts'],
+  entry: ['source/infra/interfaces/cli/index.ts'],
   format: ['esm'],
   dts: true,
   sourcemap: true,
@@ -9,8 +9,21 @@ export default defineConfig({
   minify: false,
   target: 'node20',
   outDir: 'dist',
-  treeshake: true,
+  treeshake: false,
+  unbundle: true,
 
-  // avoid bundlar deps externas
-  external: ['openai', 'zod'],
+  deps: {
+    neverBundle: ['eta'],
+  },
+
+  copy: [
+    {
+      from: 'source/infra/report/templates/guardian-report.eta',
+      to: 'dist/infra/report/templates',
+    },
+    {
+      from: 'source/infra/report/templates/partials/**/*',
+      to: 'dist/infra/report/templates/partials',
+    },
+  ],
 })
