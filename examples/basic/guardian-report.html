@@ -1,0 +1,384 @@
+<!doctype html>
+
+<html class="dark" lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Guardian Report</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#3c4a42",
+              "surface-container-highest": "#373433",
+              "on-primary-fixed": "#002113",
+              surface: "#151312",
+              outline: "#86948a",
+              "on-secondary-container": "#ffc2c4",
+              "on-secondary-fixed": "#40000d",
+              "secondary-fixed": "#ffdadb",
+              "secondary-container": "#b50036",
+              "on-background": "#e8e1df",
+              error: "#ffb4ab",
+              "error-container": "#93000a",
+              secondary: "#ffb2b7",
+              "on-primary-container": "#00422b",
+              "primary-fixed-dim": "#4edea3",
+              "inverse-surface": "#e8e1df",
+              "on-surface": "#e8e1df",
+              "tertiary-container": "#e29100",
+              "surface-bright": "#3c3837",
+              "on-secondary-fixed-variant": "#92002a",
+              "surface-tint": "#4edea3",
+              "on-primary-fixed-variant": "#005236",
+              "primary-fixed": "#6ffbbe",
+              "surface-dim": "#151312",
+              "on-error-container": "#ffdad6",
+              "on-secondary": "#67001b",
+              "surface-container-high": "#2c2928",
+              "on-tertiary": "#472a00",
+              primary: "#4edea3",
+              "on-tertiary-fixed": "#2a1700",
+              "surface-container-low": "#1d1b1a",
+              "surface-variant": "#373433",
+              "on-tertiary-container": "#523200",
+              "on-primary": "#003824",
+              "surface-container-lowest": "#100e0d",
+              "secondary-fixed-dim": "#ffb2b7",
+              "on-error": "#690005",
+              "tertiary-fixed": "#ffddb8",
+              tertiary: "#ffb95f",
+              "inverse-primary": "#006c49",
+              "surface-container": "#221f1e",
+              "on-tertiary-fixed-variant": "#653e00",
+              "on-surface-variant": "#bbcabf",
+              "inverse-on-surface": "#33302e",
+              "primary-container": "#10b981",
+              "tertiary-fixed-dim": "#ffb95f",
+              background: "#151312",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            fontFamily: {
+              headline: ["Space Grotesk"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+
+      .glass-panel {
+        background: rgba(34, 31, 30, 0.6);
+        backdrop-filter: blur(20px);
+      }
+
+      .collapsible-card {
+        cursor: pointer;
+      }
+
+      .collapsible-content {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition:
+          max-height 450ms ease,
+          opacity 350ms ease,
+          margin-top 350ms ease;
+        margin-top: 0;
+      }
+
+      .collapsible-card.expanded .collapsible-content {
+        max-height: 420px;
+        opacity: 1;
+        margin-top: 1.25rem;
+      }
+
+      .collapsible-placeholder {
+        opacity: 1;
+        max-height: 64px;
+        margin-top: 1rem;
+        overflow: hidden;
+        transition:
+          opacity 220ms ease,
+          max-height 220ms ease,
+          margin-top 220ms ease;
+      }
+
+      .collapsible-card.expanded .collapsible-placeholder {
+        opacity: 0;
+        max-height: 0;
+        margin-top: 0;
+      }
+
+      .collapsible-chevron {
+        transition: transform 300ms ease;
+      }
+
+      .collapsible-card.expanded .collapsible-chevron {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-surface text-on-surface font-body selection:bg-primary selection:text-on-primary container mx-auto"
+  >
+    <main class="pt-24 pb-12 px-8 min-h-screen">
+      <section
+        class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
+      >
+        <div>
+          <h1
+            class="font-headline text-5xl font-bold tracking-tight text-on-surface"
+          >
+            Guardian Report
+          </h1>
+          <p class="text-stone-500 mt-2 font-medium tracking-wide">
+            Análise gerada:
+            <span class="text-stone-300 text-sm"
+              >terça-feira, 21 de abril de 2026 às 03:03</span
+            >
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-4 bg-surface-container-low p-6 rounded-xl border-l-4 border-primary shadow-2xl"
+        >
+          <div class="text-right">
+            <p
+              class="font-label text-[10px] uppercase tracking-widest text-stone-400"
+            >
+              Pontuação de Segurança
+            </p>
+            <p class="font-headline text-3xl font-bold text-primary">Seguro</p>
+          </div>
+          <div
+            class="w-16 h-16 rounded-full border-4 border-primary/20 flex items-center justify-center relative"
+          >
+            <svg class="absolute inset-0 w-full h-full -rotate-90">
+              <title>Pontuação de Segurança</title>
+              <circle
+                class="text-primary"
+                cx="32"
+                cy="32"
+                fill="transparent"
+                r="28"
+                stroke="currentColor"
+                stroke-dasharray="175"
+                stroke-dashoffset="120"
+                stroke-width="4"
+              ></circle>
+            </svg>
+            <span class="font-headline text-xl font-bold text-primary">87</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div
+          class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
+          >
+            <span class="material-symbols-outlined text-4xl">check_circle</span>
+          </div>
+          <p
+            class="font-label text-xs uppercase tracking-widest text-primary mb-1"
+          >
+            Atualizações Seguras
+          </p>
+          <p class="font-headline text-4xl font-bold text-on-surface">0</p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            Prontas para implantação imediata
+          </div>
+        </div>
+        <div
+          class="bg-surface-container-low p-6 rounded-xl border-t border-secondary/20 relative overflow-hidden group"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
+          >
+            <span class="material-symbols-outlined text-4xl text-secondary"
+              >warning</span
+            >
+          </div>
+          <p
+            class="font-label text-xs uppercase tracking-widest text-secondary mb-1"
+          >
+            Riscos Críticos
+          </p>
+          <p class="font-headline text-4xl font-bold text-on-surface">0</p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+            <span class="w-2 h-2 rounded-full bg-secondary"></span>
+            Vulnerabilidade alta detectada
+          </div>
+        </div>
+        <div
+          class="bg-surface-container-low p-6 rounded-xl relative overflow-hidden group"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
+          >
+            <span class="material-symbols-outlined text-4xl text-tertiary"
+              >error</span
+            >
+          </div>
+          <p
+            class="font-label text-xs uppercase tracking-widest text-tertiary mb-1"
+          >
+            Manutenção
+          </p>
+          <p class="font-headline text-4xl font-bold text-on-surface">2</p>
+          <div class="mt-4 flex items-center gap-2 text-xs text-stone-400">
+            <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            Avisos de divergência de versão
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-32">
+        <div class="flex items-center gap-3 mb-12">
+          <span class="h-px flex-grow bg-outline-variant/30"></span>
+          <h2
+            class="font-headline text-sm uppercase tracking-[0.2em] text-stone-400"
+          >
+            Vale a pena prestar atenção...
+          </h2>
+          <span class="h-px flex-grow bg-outline-variant/30"></span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div
+            class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-sm flex flex-col"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span
+                  class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-outline-variant/10 text-stone-400 text-[10px] font-bold border border-outline-variant/10 uppercase tracking-widest"
+                  >Legal</span
+                >
+                <h3 class="font-headline text-xl font-bold mt-3">license</h3>
+              </div>
+              <span class="material-symbols-outlined text-stone-500"
+                >gavel</span
+              >
+            </div>
+
+            <p class="text-stone-400 text-sm leading-relaxed mt-4 flex-1">
+              O projeto não define uma licença. Isso pode gerar incertezas
+              legais para uso e distribuição.
+            </p>
+
+            <div
+              class="mt-5 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10"
+            >
+              <p
+                class="font-label text-[10px] uppercase tracking-widest text-primary mb-2"
+              >
+                Recomendação do Guardian
+              </p>
+              <p class="text-stone-400 text-sm leading-relaxed">
+                Defina o campo &quot;license&quot; no package.json conforme a
+                política do projeto/empresa.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10 shadow-sm flex flex-col"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span
+                  class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-outline-variant/10 text-stone-400 text-[10px] font-bold border border-outline-variant/10 uppercase tracking-widest"
+                  >Project Maturity</span
+                >
+                <h3 class="font-headline text-xl font-bold mt-3">scripts</h3>
+              </div>
+              <span class="material-symbols-outlined text-stone-500">rule</span>
+            </div>
+
+            <p class="text-stone-400 text-sm leading-relaxed mt-4 flex-1">
+              O package.json não define scripts essenciais como test, lint ou
+              build. Isso pode indicar ausência de automações importantes no
+              fluxo de desenvolvimento.
+            </p>
+
+            <div
+              class="mt-5 bg-surface-container-lowest p-4 rounded-lg border border-outline-variant/10"
+            >
+              <p
+                class="font-label text-[10px] uppercase tracking-widest text-primary mb-2"
+              >
+                Recomendação do Guardian
+              </p>
+              <p class="text-stone-400 text-sm leading-relaxed">
+                Defina scripts mínimos e padronize o uso no CI
+                (test/lint/build).
+              </p>
+
+              <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-outline-variant/20 bg-surface-container-high text-stone-300"
+                  >lint</span
+                >
+
+                <span
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-outline-variant/20 bg-surface-container-high text-stone-300"
+                  >build</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const toggleCard = (card) => {
+        const isExpanded = card.classList.toggle("expanded");
+        card.setAttribute("aria-expanded", String(isExpanded));
+      };
+
+      document.querySelectorAll("[data-collapsible-card]").forEach((card) => {
+        card.addEventListener("click", () => toggleCard(card));
+        card.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            toggleCard(card);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
