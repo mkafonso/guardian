@@ -1,4 +1,7 @@
-import type { ProjectManifestSnapshot } from '../ports/project-manifest-reader.port'
+import type {
+  PackageConstraintsSnapshot,
+  ProjectManifestSnapshot,
+} from '../ports/project-manifest-reader.port'
 
 export type StaticMaintenanceFindingCode =
   | 'react-without-typescript'
@@ -14,6 +17,7 @@ export type StaticMaintenanceFindingCode =
   | 'cross-env-not-needed'
   | 'missing-node-engine'
   | 'multiple-lockfiles'
+  | 'manual-package-constraints'
   | 'redundant-dependencies'
   | 'dotenv-config-growth'
   | 'missing-license'
@@ -294,6 +298,28 @@ export class StaticMaintenanceAnalysisService {
       }
     }
 
+    if (input.manifest?.constraints) {
+      const manualConstraints = this.listManualConstraints(
+        input.manifest.constraints,
+      )
+
+      if (manualConstraints.length > 0) {
+        findings.push(
+          this.createFinding({
+            code: 'manual-package-constraints',
+            tag: 'warning',
+            icon: 'warning',
+            packageName: 'overrides/resolutions',
+            description:
+              'Você está forçando versões manualmente (resolutions/overrides). Isso pode quebrar libs silenciosamente, esconder vulnerabilidades reais e gerar comportamento inesperado em runtime.',
+            recommendation:
+              'Use com moderação: prefira atualizar a dependência raiz e remova overrides/resolutions quando possível.',
+            alternatives: manualConstraints,
+          }),
+        )
+      }
+    }
+
     const redundantGroups = this.listRedundantDependencyGroups(dependencySet)
     if (redundantGroups.length > 0) {
       findings.push(
@@ -433,6 +459,55 @@ export class StaticMaintenanceAnalysisService {
     }
 
     return findings.sort((a, b) => a.localeCompare(b)).slice(0, 12)
+  }
+
+  private listManualConstraints(
+    constraints: PackageConstraintsSnapshot,
+  ): string[] {
+    const overrides = Object.entries(constraints.overrides)
+      .map(([name, value]) => this.formatOverrideConstraint(name, value))
+      .filter((value) => value.length > 0)
+      .sort((a, b) => a.localeCompare(b))
+      .slice(0, 12)
+
+    const resolutions = Object.entries(constraints.resolutions)
+      .map(([name, version]) => this.formatResolutionConstraint(name, version))
+      .filter((value) => value.length > 0)
+      .sort((a, b) => a.localeCompare(b))
+      .slice(0, 12)
+
+    return [...overrides, ...resolutions]
+  }
+
+  private formatOverrideConstraint(name: string, value: unknown): string {
+    const normalizedName = name.trim()
+
+    if (!normalizedName) {
+      return ''
+    }
+
+    if (typeof value === 'string') {
+      const version = value.trim()
+      return version ? `overrides: ${normalizedName}@${version}` : ''
+    }
+
+    if (value && typeof value === 'object') {
+      return `overrides: ${normalizedName}=${JSON.stringify(value)}`
+    }
+
+    const raw = String(value ?? '').trim()
+    return raw ? `overrides: ${normalizedName}@${raw}` : ''
+  }
+
+  private formatResolutionConstraint(name: string, version: string): string {
+    const normalizedName = name.trim()
+    const normalizedVersion = version.trim()
+
+    if (!normalizedName || !normalizedVersion) {
+      return ''
+    }
+
+    return `resolutions: ${normalizedName}@${normalizedVersion}`
   }
 
   private shouldWarnToolingComplexity(
