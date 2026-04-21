@@ -64,8 +64,7 @@ export class UpgradePlanningService {
     )
 
     const isCriticalUpdate = riskLevel === 'critical' || riskLevel === 'high'
-    const isSafeUpdate =
-      !isCriticalUpdate && (upgradeType === 'patch' || dependency.isDev)
+    const isSafeUpdate = !isCriticalUpdate && upgradeType === 'patch'
 
     const isMaintenanceUpdate = !isCriticalUpdate && !isSafeUpdate
 
