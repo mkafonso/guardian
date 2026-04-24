@@ -1,3 +1,4 @@
+import type { PackageRegistryMetadata } from '../ports/package-registry.port'
 import type {
   PackageConstraintsSnapshot,
   ProjectManifestSnapshot,
@@ -21,6 +22,7 @@ export type StaticMaintenanceFindingCode =
   | 'redundant-dependencies'
   | 'dotenv-config-growth'
   | 'missing-license'
+  | 'single-maintainer-risk'
 
 export type StaticMaintenanceFinding = {
   code: StaticMaintenanceFindingCode
@@ -36,6 +38,7 @@ export type StaticMaintenanceFinding = {
 export type StaticMaintenanceAnalysisInput = {
   dependencyNames: string[]
   manifest: ProjectManifestSnapshot | null
+  registryMetadata?: PackageRegistryMetadata[]
 }
 
 export class StaticMaintenanceAnalysisService {
@@ -340,6 +343,34 @@ export class StaticMaintenanceAnalysisService {
             'Defina o campo "license" no package.json conforme a política do projeto/empresa.',
         }),
       )
+    }
+
+    if (input.registryMetadata) {
+      const riskyPackages = input.registryMetadata
+        .filter((pkg) => {
+          if (!pkg.maintainersCount) return false
+
+          return pkg.maintainersCount <= 1
+        })
+        .map((pkg) => pkg.name)
+        .sort((a, b) => a.localeCompare(b))
+        .slice(0, 12)
+
+      if (riskyPackages.length > 0) {
+        findings.push(
+          this.createFinding({
+            code: 'single-maintainer-risk',
+            tag: 'Bus Factor',
+            icon: 'person',
+            packageName: 'dependencies',
+            description:
+              'Algumas dependências possuem apenas um mantenedor. Isso aumenta o risco de abandono, falta de patches de segurança e lentidão na evolução.',
+            recommendation:
+              'Avalie a criticidade dessas libs. Para dependências essenciais, considere alternativas mais mantidas ou monitore ativamente atualizações.',
+            alternatives: riskyPackages,
+          }),
+        )
+      }
     }
 
     return this.sortFindings(findings)

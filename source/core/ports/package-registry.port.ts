@@ -11,6 +11,7 @@ export type PackageRegistryMetadata = {
   repositoryUrl: string | null
   license: string | null
   publishedVersions: PackageVersionMetadata[]
+  maintainersCount: number | null
 }
 
 export interface PackageRegistryPort {

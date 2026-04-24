@@ -12,6 +12,7 @@ type NpmRegistryPackageResponse = {
   'dist-tags'?: unknown
   time?: unknown
   versions?: unknown
+  maintainers?: { name: string; email: string }[]
 }
 
 type NpmRegistryRepository =
@@ -75,6 +76,7 @@ export class NpmRegistryAdapter implements PackageRegistryPort {
             repositoryUrl: null,
             license: null,
             publishedVersions: [],
+            maintainersCount: null,
           } satisfies PackageRegistryMetadata
         }
       }),
@@ -130,6 +132,7 @@ export class NpmRegistryAdapter implements PackageRegistryPort {
       repositoryUrl: this.resolveRepositoryUrl(input.repository),
       license: this.readString(input.license),
       publishedVersions: this.mapPublishedVersions(time),
+      maintainersCount: input.maintainers?.length ?? null,
     }
   }
 

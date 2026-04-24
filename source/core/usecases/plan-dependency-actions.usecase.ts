@@ -145,6 +145,9 @@ export class PlanDependencyActionsUseCase {
     const staticFindings = this.staticMaintenanceAnalysisService.handle({
       dependencyNames: input.dependencies.map((item) => item.inventory.name),
       manifest: input.manifest,
+      registryMetadata: input.dependencies
+        .map((item) => item.registry)
+        .filter((item): item is NonNullable<typeof item> => Boolean(item)),
     })
 
     const staticCards = staticFindings.map((finding) =>
