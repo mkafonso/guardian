@@ -4,13 +4,13 @@ export default defineConfig({
   entry: ['source/infra/interfaces/cli/index.ts'],
   format: ['esm'],
   dts: false,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
-  minify: false,
+  minify: true,
   target: 'node20',
   outDir: 'dist',
   treeshake: false,
-  unbundle: true,
+  unbundle: false,
 
   deps: {
     neverBundle: ['eta', 'picocolors', 'yocto-spinner'],
@@ -19,11 +19,11 @@ export default defineConfig({
   copy: [
     {
       from: 'source/infra/report/templates/guardian-report.eta',
-      to: 'dist/infra/report/templates',
+      to: 'dist/templates',
     },
     {
       from: 'source/infra/report/templates/partials/**/*',
-      to: 'dist/infra/report/templates/partials',
+      to: 'dist/templates/partials',
     },
   ],
 })
