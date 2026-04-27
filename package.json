@@ -44,7 +44,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "eta": "4.5.1",
+    "eta": "4.6.0",
     "picocolors": "1.1.1",
     "yocto-spinner": "1.1.0"
   },
