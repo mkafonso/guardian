@@ -46,10 +46,10 @@
   "dependencies": {
     "eta": "4.6.0",
     "picocolors": "1.1.1",
-    "yocto-spinner": "1.1.0"
+    "yocto-spinner": "1.2.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.13",
+    "@biomejs/biome": "2.4.14",
     "@types/node": "25.6.0",
     "dotenv": "17.4.2",
     "tsdown": "0.21.10",
