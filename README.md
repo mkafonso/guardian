@@ -112,6 +112,7 @@ guardian analyze [projectPath] [options]
 ```
 
 - `--output, -o <file>`: caminho do HTML de saída
+- `--json [file]`: gera o relatório em JSON; use `>` para redirecionar ou forneça um arquivo opcional
 - `--no-incidents`: desabilita o radar de incidentes
 - `--no-reachability`: desabilita a análise de reachability
 
@@ -121,6 +122,8 @@ Exemplos:
 guardian analyze
 guardian analyze .
 guardian analyze ./my-app --output guardian-report.html
+guardian analyze --json > guardian-report.json
+guardian analyze --json guardian-report.json
 ```
 
 ## Radar de Incidentes

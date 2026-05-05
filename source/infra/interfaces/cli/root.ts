@@ -80,6 +80,7 @@ Commands:
 
 Analyze options:
   --output, -o <file>         Output HTML file path
+  --json [file]               Output JSON instead of HTML; optional file path
   --no-incidents              Disable incidents radar
   --no-reachability           Disable reachability analysis
 
@@ -87,6 +88,8 @@ Examples:
   guardian analyze
   guardian analyze .
   guardian analyze ./my-app --output guardian-report.html
+  guardian analyze --json > guardian-report.json
+  guardian analyze --json guardian-report.json
 `.trim(),
   )
 }

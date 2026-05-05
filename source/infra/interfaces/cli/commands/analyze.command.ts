@@ -25,21 +25,20 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import pc from 'picocolors'
 import yoctoSpinner from 'yocto-spinner'
-
-type AnalyzeCommandOptions = {
-  projectPath: string
-  outputPath: string
-  includeSecurityIncidents: boolean
-  includeReachability: boolean
-}
+import { parseAnalyzeCommandOptions } from './analyze.command.options'
 
 export async function runAnalyzeCommand(args: string[]): Promise<void> {
   const options = parseAnalyzeCommandOptions(args)
+  const isJsonMode = options.outputFormat === 'json'
+  const isJsonStdout = isJsonMode && options.outputToStdout
 
   const projectPath = path.resolve(process.cwd(), options.projectPath)
-  const outputPath = path.resolve(process.cwd(), options.outputPath)
+  const fileOutputPath = isJsonStdout
+    ? undefined
+    : path.resolve(process.cwd(), options.jsonOutputPath ?? options.outputPath)
 
-  console.log(pc.dim(`guardian: analyzing project at "${projectPath}"`))
+  const log = isJsonStdout ? console.error : console.log
+  log(pc.dim(`guardian: analyzing project at "${projectPath}"`))
 
   const dependencyClassificationService = new DependencyClassificationService()
   const riskScoringService = new RiskScoringService()
@@ -209,6 +208,44 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
     actionableInsights: incidents.actionableInsights,
   })
 
+  if (isJsonMode) {
+    const jsonOutput = await runStep(
+      'gerando report JSON...',
+      () => {
+        return pc.green('JSON gerado')
+      },
+      async () => {
+        return JSON.stringify(viewModel, null, 2)
+      },
+      isJsonStdout,
+      isJsonStdout,
+    )
+
+    if (options.outputToStdout) {
+      process.stdout.write(`${jsonOutput}\n`)
+      return
+    }
+
+    if (!fileOutputPath) {
+      throw new Error('JSON output path could not be resolved.')
+    }
+
+    await runStep(
+      'salvando report...',
+      () => {
+        return pc.green(
+          `report salvo em ${pc.bold(path.relative(process.cwd(), fileOutputPath) || fileOutputPath)}`,
+        )
+      },
+      async () => {
+        await ensureParentDirectoryExists(fileOutputPath)
+        await writeFile(fileOutputPath, jsonOutput, 'utf8')
+      },
+    )
+
+    return
+  }
+
   const html = await runStep(
     'gerando report HTML...',
     () => {
@@ -219,16 +256,20 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
     },
   )
 
+  if (!fileOutputPath) {
+    throw new Error('HTML output path could not be resolved.')
+  }
+
   await runStep(
     'salvando report...',
     () => {
       return pc.green(
-        `report salvo em ${pc.bold(path.relative(process.cwd(), outputPath) || outputPath)}`,
+        `report salvo em ${pc.bold(path.relative(process.cwd(), fileOutputPath) || fileOutputPath)}`,
       )
     },
     async () => {
-      await ensureParentDirectoryExists(outputPath)
-      await writeFile(outputPath, html, 'utf8')
+      await ensureParentDirectoryExists(fileOutputPath)
+      await writeFile(fileOutputPath, html, 'utf8')
     },
   )
 }
@@ -237,75 +278,46 @@ function runStep<T>(
   text: string,
   successText: (value: T) => string,
   fn: () => Promise<T>,
+  useStderr = false,
+  disableSpinner = false,
 ): Promise<T> {
-  const spinner = yoctoSpinner({ text: `${text}` }).start()
+  const log = useStderr ? console.error : console.log
+  const spinner = disableSpinner
+    ? null
+    : yoctoSpinner({ text: `${text}` }).start()
+
+  if (disableSpinner) {
+    log(text)
+  }
 
   return new Promise((resolve) => {
     setTimeout(resolve, 0)
   }).then(async () => {
     try {
       const value = await fn()
-      spinner.success(`${successText(value)}`)
+
+      if (spinner) {
+        spinner.success(`${successText(value)}`)
+      } else {
+        log(successText(value))
+      }
+
       return value
     } catch (error) {
       const message =
         error instanceof Error && error.message.trim().length > 0
           ? error.message.trim()
           : 'erro inesperado'
-      spinner.error(`${pc.red('✖')} ${message}`)
+
+      if (spinner) {
+        spinner.error(`${pc.red('✖')} ${message}`)
+      } else {
+        log(`${pc.red('✖')} ${message}`)
+      }
+
       throw error
     }
   })
-}
-
-function parseAnalyzeCommandOptions(args: string[]): AnalyzeCommandOptions {
-  let projectPath = '.'
-  let outputPath = 'guardian-report.html'
-  let includeSecurityIncidents = true
-  let includeReachability = true
-
-  for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index]
-
-    if (!arg) {
-      continue
-    }
-
-    if (arg === '--no-incidents') {
-      includeSecurityIncidents = false
-      continue
-    }
-
-    if (arg === '--no-reachability') {
-      includeReachability = false
-      continue
-    }
-
-    if (arg === '--output' || arg === '-o') {
-      const value = args[index + 1]
-
-      if (!value || value.startsWith('-')) {
-        throw new Error('Missing value for --output option.')
-      }
-
-      outputPath = value
-      index += 1
-      continue
-    }
-
-    if (arg.startsWith('-')) {
-      throw new Error(`Unknown option "${arg}".`)
-    }
-
-    projectPath = arg
-  }
-
-  return {
-    projectPath,
-    outputPath,
-    includeSecurityIncidents,
-    includeReachability,
-  }
 }
 
 function resolveTemplatesPath(): string {
