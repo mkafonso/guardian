@@ -25,7 +25,8 @@
     "nodejs"
   ],
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "bin": {
     "guardian": "./dist/index.mjs"
