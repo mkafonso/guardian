@@ -5,7 +5,7 @@ export default defineConfig({
     cli: 'source/infra/interfaces/cli/index.ts',
     index: 'source/index.ts',
   },
-  format: ['esm'],
+  format: ['esm', 'cjs'],
   dts: false,
   sourcemap: false,
   clean: true,

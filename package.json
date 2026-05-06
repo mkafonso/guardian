@@ -31,8 +31,10 @@
   "bin": {
     "guardian": "./dist/cli.mjs"
   },
+  "main": "./dist/index.cjs",
   "exports": {
     ".": {
+      "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     }
   },
