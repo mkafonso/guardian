@@ -1,7 +1,10 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  entry: ['source/infra/interfaces/cli/index.ts'],
+  entry: {
+    cli: 'source/infra/interfaces/cli/index.ts',
+    index: 'source/index.ts',
+  },
   format: ['esm'],
   dts: false,
   sourcemap: false,

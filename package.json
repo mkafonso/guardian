@@ -29,7 +29,12 @@
     "README.md"
   ],
   "bin": {
-    "guardian": "./dist/index.mjs"
+    "guardian": "./dist/cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
   },
   "engines": {
     "node": ">=20"
