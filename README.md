@@ -84,6 +84,12 @@ Isso irá:
 - Priorizar riscos e sugerir ações
 - Gerar o relatório HTML
 
+Você também pode passar o conteúdo de um `package.json` diretamente como texto, sem precisar de um projeto em disco:
+
+```bash
+guardian analyze '{"name":"my-app","dependencies":{"lodash":"4.17.20","express":"4.18.2"}}'
+```
+
 <br />
 <br />
 ## Output
@@ -108,7 +114,7 @@ Abra no navegador e compartilhe com o time.
 ## Opções
 
 ```bash
-guardian analyze [projectPath] [options]
+guardian analyze [projectPath|packageJsonText] [options]
 ```
 
 - `--output, -o <file>`: caminho do HTML de saída
@@ -124,6 +130,11 @@ guardian analyze .
 guardian analyze ./my-app --output guardian-report.html
 guardian analyze --json > guardian-report.json
 guardian analyze --json guardian-report.json
+
+# Modo inline: passa o package.json como texto
+guardian analyze '{"name":"my-app","dependencies":{"express":"4.18.2"}}'
+guardian analyze '{"dependencies":{"lodash":"4.17.20"}}' --json
+guardian analyze '{"dependencies":{"axios":"1.6.0"}}' --output report.html
 ```
 
 ## Radar de Incidentes
