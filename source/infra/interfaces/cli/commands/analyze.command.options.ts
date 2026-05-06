@@ -1,5 +1,6 @@
 export type AnalyzeCommandOptions = {
   projectPath: string
+  inlineManifest: string | null
   outputPath: string
   outputFormat: 'html' | 'json'
   jsonOutputPath?: string
@@ -12,6 +13,7 @@ export function parseAnalyzeCommandOptions(
   args: string[],
 ): AnalyzeCommandOptions {
   let projectPath = '.'
+  let inlineManifest: string | null = null
   let outputPath = 'guardian-report.html'
   let outputPathExplicit = false
   let outputFormat: 'html' | 'json' = 'html'
@@ -68,7 +70,11 @@ export function parseAnalyzeCommandOptions(
       throw new Error(`Unknown option "${arg}".`)
     }
 
-    projectPath = arg
+    if (arg.trimStart().startsWith('{')) {
+      inlineManifest = arg
+    } else {
+      projectPath = arg
+    }
   }
 
   if (
@@ -82,9 +88,10 @@ export function parseAnalyzeCommandOptions(
 
   return {
     projectPath,
+    inlineManifest,
     outputPath,
     outputFormat,
-    jsonOutputPath,
+    ...(jsonOutputPath !== undefined ? { jsonOutputPath } : {}),
     outputToStdout,
     includeSecurityIncidents,
     includeReachability,

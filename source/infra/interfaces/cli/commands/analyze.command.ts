@@ -14,6 +14,8 @@ import { CollectSecurityIncidentsUseCase } from '@/core/usecases/collect-securit
 import { PlanDependencyActionsUseCase } from '@/core/usecases/plan-dependency-actions.usecase'
 import { OpenAISecurityIncidentNarratorAdapter } from '@/infra/ai/openai-security-incident-narrator.adapter'
 import { FileSystemProjectManifestReaderAdapter } from '@/infra/package-managers/file-system-project-manifest-reader.adapter'
+import { InlineDependencyInventoryAdapter } from '@/infra/package-managers/inline-dependency-inventory.adapter'
+import { InlineProjectManifestReaderAdapter } from '@/infra/package-managers/inline-project-manifest-reader.adapter'
 import { PackageJsonDependencyInventoryAdapter } from '@/infra/package-managers/package-json-dependency-inventory.adapter'
 import { SimpleReachabilityAnalyzerAdapter } from '@/infra/reachability/simple-reachability-analyzer.adapter'
 import { NpmRegistryAdapter } from '@/infra/registries/npm-registry.adapter'
@@ -32,13 +34,20 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
   const isJsonMode = options.outputFormat === 'json'
   const isJsonStdout = isJsonMode && options.outputToStdout
 
-  const projectPath = path.resolve(process.cwd(), options.projectPath)
+  const isInlineMode = options.inlineManifest !== null
+  const projectPath = isInlineMode
+    ? ''
+    : path.resolve(process.cwd(), options.projectPath)
   const fileOutputPath = isJsonStdout
     ? undefined
     : path.resolve(process.cwd(), options.jsonOutputPath ?? options.outputPath)
 
   const log = isJsonStdout ? console.error : console.log
-  log(pc.dim(`guardian: analyzing project at "${projectPath}"`))
+  if (isInlineMode) {
+    log(pc.dim('guardian: analisando package.json inline...'))
+  } else {
+    log(pc.dim(`guardian: analyzing project at "${projectPath}"`))
+  }
 
   const dependencyClassificationService = new DependencyClassificationService()
   const riskScoringService = new RiskScoringService()
@@ -53,10 +62,12 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
   const guardianReportViewModelBuilderService =
     new GuardianReportViewModelBuilderService()
 
-  const projectManifestReader = new FileSystemProjectManifestReaderAdapter()
-  const dependencyInventory = new PackageJsonDependencyInventoryAdapter(
-    projectManifestReader,
-  )
+  const projectManifestReader = isInlineMode
+    ? new InlineProjectManifestReaderAdapter(options.inlineManifest as string)
+    : new FileSystemProjectManifestReaderAdapter()
+  const dependencyInventory = isInlineMode
+    ? new InlineDependencyInventoryAdapter(options.inlineManifest as string)
+    : new PackageJsonDependencyInventoryAdapter(projectManifestReader)
   const packageRegistry = new NpmRegistryAdapter()
   const vulnerabilityDataSource = new OsvVulnerabilityDataSourceAdapter()
   const reachabilityAnalyzer = new SimpleReachabilityAnalyzerAdapter()
@@ -126,7 +137,7 @@ export async function runAnalyzeCommand(args: string[]): Promise<void> {
       return await assessDependencyRisksUseCase.execute({
         projectPath,
         dependencies: analyzed.dependencies,
-        includeReachability: options.includeReachability,
+        includeReachability: isInlineMode ? false : options.includeReachability,
       })
     },
   )
