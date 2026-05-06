@@ -92,6 +92,30 @@ guardian analyze '{"name":"my-app","dependencies":{"lodash":"4.17.20","express":
 
 <br />
 <br />
+## Uso como biblioteca
+
+Se você quiser usar o Guardian em código, importe o analisador direto do pacote:
+
+```ts
+import { analyzePackageJsonText } from '@mkafonso/guardian'
+
+const report = await analyzePackageJsonText(
+  JSON.stringify({
+    name: 'my-app',
+    dependencies: {
+      lodash: '4.17.21',
+      express: '4.18.2',
+    },
+  }),
+)
+
+console.log(report)
+```
+
+O retorno é um objeto de relatório com as mesmas informações usadas para gerar o HTML.
+
+<br />
+<br />
 ## Output
 
 Por padrão, um arquivo será gerado no diretório atual:
