@@ -64,7 +64,9 @@ export class UpgradePlanningService {
     )
 
     const isCriticalUpdate = riskLevel === 'critical' || riskLevel === 'high'
-    const isSafeUpdate = !isCriticalUpdate && upgradeType === 'patch'
+    const isSafeUpdate =
+      !isCriticalUpdate &&
+      (upgradeType === 'patch' || upgradeType === 'minor')
 
     const isMaintenanceUpdate = !isCriticalUpdate && !isSafeUpdate
 
@@ -87,10 +89,16 @@ export class UpgradePlanningService {
   }
 
   private isOutdated(dependency: DependencyInventoryItem): boolean {
-    return (
-      dependency.latestVersion !== null &&
-      dependency.version !== dependency.latestVersion
-    )
+    if (!dependency.latestVersion) return false
+
+    const current = this.parseSemver(dependency.version)
+    const latest = this.parseSemver(dependency.latestVersion)
+
+    if (!current || !latest) return false
+    if (latest.major !== current.major) return latest.major > current.major
+    if (latest.minor !== current.minor) return latest.minor > current.minor
+
+    return latest.patch > current.patch
   }
 
   private resolveUpgradeType(
